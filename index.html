@@ -7,8 +7,8 @@
   <style>
     :root{
       --bg:#0b0f19; --card:#121a2a; --muted:#94a3b8; --text:#e5e7eb;
-      --accent:#60a5fa; --accent2:#34d399; --warn:#fbbf24; --danger:#fb7185;
-      --line:#22314f; --chip:#0f172a;
+      --accent:#60a5fa; --good:#34d399; --warn:#fbbf24; --danger:#fb7185;
+      --line:#22314f;
     }
     *{box-sizing:border-box}
     body{margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Noto Sans KR,sans-serif;
@@ -35,13 +35,12 @@
     button.danger{border-color:rgba(251,113,133,.7)}
     button.ghost{background:transparent}
     button:disabled{opacity:.55; cursor:not-allowed}
-    .tabs{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px}
-    .tab{padding:8px 10px; border-radius:999px; background:rgba(15,23,42,.25)}
-    .tab.on{border-color:rgba(96,165,250,.8); background:rgba(96,165,250,.12)}
-    main{padding:22px 0 60px}
+    main{padding:16px 0 60px}
+
     .grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
     @media (max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
     @media (max-width:560px){.grid{grid-template-columns:1fr} input{min-width:0; flex:1}}
+
     .card{
       background:rgba(18,26,42,.92);
       border:1px solid rgba(34,49,79,.9);
@@ -65,7 +64,8 @@
     .fav.on{background:rgba(52,211,153,.12)}
     .empty{color:var(--muted); padding:20px 4px}
     .hint{color:var(--muted); font-size:12px; margin-top:10px}
-    .rightTools{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end}
+    .hr{height:1px; background:rgba(34,49,79,.75); margin:14px 0}
+    .small{font-size:12px; color:var(--muted)}
 
     /* Modal */
     .backdrop{position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; padding:16px}
@@ -86,9 +86,6 @@
     .formRow label{font-size:12px; color:var(--muted)}
     .split{display:flex; gap:10px; flex-wrap:wrap}
     .split > *{flex:1}
-    .hr{height:1px; background:rgba(34,49,79,.75); margin:14px 0}
-    .small{font-size:12px; color:var(--muted)}
-    .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
   </style>
 </head>
 
@@ -98,19 +95,12 @@
     <div class="top">
       <div style="display:flex; align-items:center; gap:10px;">
         <h1>🍜 Matzip Picks</h1>
-        <span class="pill">풀세트 MVP · no backend (서버 없이) · good vibes(감성)로 ㄱㄱ</span>
+        <span class="pill">이달의 맛집 TOP10(❤️ 좋아요 합산) · GitHub Pages</span>
       </div>
-      <div class="rightTools">
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
         <span class="pill" id="countPill">0 places</span>
         <span class="pill" id="locPill">📍 위치: 미사용</span>
       </div>
-    </div>
-
-    <div class="tabs">
-      <button class="tab on" id="tabAll">전체</button>
-      <button class="tab" id="tabReco">추천</button>
-      <button class="tab" id="tabFav">즐겨찾기</button>
-      <button class="tab" id="tabRecent">최근 본</button>
     </div>
 
     <div class="controls">
@@ -139,21 +129,30 @@
       <button class="ghost" id="reset">리셋</button>
     </div>
 
-    <div class="controls" style="margin-top:10px">
-      <button class="ghost" id="exportBtn">데이터 내보내기(JSON)</button>
-      <button class="ghost" id="importBtn">데이터 가져오기(JSON)</button>
-      <input id="importFile" type="file" accept="application/json" style="display:none">
-      <span class="pill">팁: lat/lng 있으면 거리/가까운순 “진짜로” 됨</span>
-    </div>
-
     <div class="hint">
-      ✅ 저장/추천/최근본은 브라우저에 저장됨(localStorage).  
-      ⚠️ 회사 PC에서 시크릿 모드면 저장이 날아갈 수 있다 아이가(=그럴 수 있음).
+      ✅ “❤️ 좋아요 TOP10”은 모든 사용자 합산(구글시트).  
+      ✅ “☆저장”은 개인 즐겨찾기(내 브라우저 저장).
     </div>
   </div>
 </header>
 
 <main class="wrap">
+  <!-- Monthly ranking -->
+  <div class="card" id="monthlyBox" style="margin-bottom:12px;">
+    <div class="row">
+      <div>
+        <div class="name">🏆 이달의 맛집 TOP 10 (❤️ 좋아요)</div>
+        <div class="small" id="monthlyMonth">불러오는 중...</div>
+      </div>
+      <button class="ghost" id="reloadRank">새로고침</button>
+    </div>
+    <div class="hr"></div>
+    <div id="monthlyList" class="small">불러오는 중...</div>
+    <div class="small" style="margin-top:10px;">
+      * 좋아요는 “브라우저당 월 1회/가게” 정도만 막아둠(완벽한 부정방지는 로그인 필요).
+    </div>
+  </div>
+
   <div class="grid" id="grid"></div>
   <div class="empty" id="empty" style="display:none;">검색 결과가 없데이(=없음). 키워드나 필터를 바꿔보이소.</div>
 </main>
@@ -174,16 +173,13 @@
     </div>
 
     <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap">
+      <button class="good" id="likeThisMonth">❤️ 좋아요</button>
       <button class="ghost" id="mapKakao">카카오 지도</button>
       <button class="ghost" id="mapNaver">네이버 지도</button>
       <button class="ghost" id="mapGoogle">구글 지도</button>
       <button class="ghost" id="copy">정보 복사</button>
       <button class="warn" id="edit">수정</button>
       <button class="danger" id="del">삭제</button>
-    </div>
-
-    <div class="small" style="margin-top:10px">
-      최근 본 기록/추천 점수는 자동 반영됨. (요게 은근 “서비스 맛” 나게 함)
     </div>
   </div>
 </div>
@@ -193,7 +189,7 @@
   <div class="modal">
     <button class="close ghost" id="closeForm">닫기</button>
     <h2 id="fTitle">맛집 추가</h2>
-    <div class="small">lat/lng(위도/경도)까지 넣으면 거리 정렬이 찐으로 됨. 없으면 지도 검색 링크로 커버 가능.</div>
+    <div class="small">lat/lng 넣으면 거리 정렬이 찐으로 됨. 없으면 주소만으로도 OK.</div>
 
     <div class="hr"></div>
 
@@ -252,7 +248,7 @@
           <input id="fLat" type="number" step="0.000001" placeholder="위도(lat) 예: 37.5665" />
           <input id="fLng" type="number" step="0.000001" placeholder="경도(lng) 예: 126.9780" />
         </div>
-        <div class="small">lat/lng는 구글 지도에서 위치 우클릭 → 좌표 복사하면 됨.</div>
+        <div class="small">구글지도에서 우클릭 → 좌표 복사해서 붙이면 됨.</div>
       </div>
     </div>
 
@@ -267,12 +263,17 @@
 
 <script>
 /* ============================
-   Matzip Picks - Full MVP
+const LIKE_API_URL = "https://script.google.com/macros/s/AKfycbzguY674lSLefGSKr0S0PkLyuQ9quEq1huyAWeVNAgBp5IuqMkfN9_KSnLD6q2DZXcH1w/exec";
    ============================ */
+// TODO: 네 Apps Script 웹앱 URL로 바꿔라!
+const LIKE_API_URL = "https://script.google.com/macros/s/AKfycbzAYJrJ8j08iyR61S1W97E4yNI0dRUMKS8f6Bt1_EnZjRVG7om9LxEeyUODrqcXdv3PeA/exec";
 
-const LS_PLACES = "matzip_places_v2";
-const LS_FAVS   = "matzip_favs_v2";
-const LS_RECENT = "matzip_recent_v2";
+/* ============================
+   1) Storage keys / seed
+   ============================ */
+const LS_PLACES = "matzip_places_v3";
+const LS_FAVS   = "matzip_favs_v3";
+const LS_RECENT = "matzip_recent_v3";
 const LS_LOC    = "matzip_my_loc_v1";
 
 const seed = [
@@ -320,17 +321,20 @@ const seed = [
   }
 ];
 
-// --- State
-let places = loadPlaces();             // array
-let favs   = loadSet(LS_FAVS);         // Set
-let recent = loadArray(LS_RECENT);     // array of ids
-let myLoc  = loadJSON(LS_LOC, null);   // {lat,lng,ts} or null
+/* ============================
+   2) State
+   ============================ */
+let places = loadPlaces();
+let favs   = loadSet(LS_FAVS);
+let recent = loadArray(LS_RECENT);
+let myLoc  = loadJSON(LS_LOC, null);
 
-let activeTab = "all"; // all | reco | fav | recent
 let selectedId = null;
 let editingId  = null;
 
-// --- Elements
+/* ============================
+   3) Elements
+   ============================ */
 const grid = document.getElementById("grid");
 const empty = document.getElementById("empty");
 const countPill = document.getElementById("countPill");
@@ -345,15 +349,10 @@ const addPlace = document.getElementById("addPlace");
 const addDemo = document.getElementById("addDemo");
 const reset = document.getElementById("reset");
 
-const exportBtn = document.getElementById("exportBtn");
-const importBtn = document.getElementById("importBtn");
-const importFile = document.getElementById("importFile");
-
-// Tabs
-const tabAll = document.getElementById("tabAll");
-const tabReco = document.getElementById("tabReco");
-const tabFav = document.getElementById("tabFav");
-const tabRecent = document.getElementById("tabRecent");
+// Monthly rank
+const monthlyMonth = document.getElementById("monthlyMonth");
+const monthlyList = document.getElementById("monthlyList");
+const reloadRank = document.getElementById("reloadRank");
 
 // Detail modal
 const detailBackdrop = document.getElementById("detailBackdrop");
@@ -365,6 +364,7 @@ const mAddr  = document.getElementById("mAddr");
 const mMenu  = document.getElementById("mMenu");
 const mPrice = document.getElementById("mPrice");
 const mHours = document.getElementById("mHours");
+const likeThisMonth = document.getElementById("likeThisMonth");
 const mapKakao = document.getElementById("mapKakao");
 const mapNaver = document.getElementById("mapNaver");
 const mapGoogle = document.getElementById("mapGoogle");
@@ -390,19 +390,32 @@ const fLng   = document.getElementById("fLng");
 const fCancel= document.getElementById("fCancel");
 const fSave  = document.getElementById("fSave");
 
-// --- Events
+/* ============================
+   4) Events
+   ============================ */
 [q, cat, sort].forEach(el => el.addEventListener("input", render));
 
-tabAll.addEventListener("click", () => setTab("all"));
-tabReco.addEventListener("click", () => setTab("reco"));
-tabFav.addEventListener("click", () => setTab("fav"));
-tabRecent.addEventListener("click", () => setTab("recent"));
+addDemo.addEventListener("click", () => {
+  const ids = new Set(places.map(p=>p.id));
+  let added = 0;
+  seed.forEach(p=>{
+    if(!ids.has(p.id)){ places.push(structPlace(p)); added++; }
+  });
+  if(added){ savePlaces(); render(); refreshMonthlyRanking(); }
+  else alert("데모는 이미 들어가 있데이(=있음).");
+});
+
+addPlace.addEventListener("click", () => openForm(null));
+
+reset.addEventListener("click", () => {
+  q.value=""; cat.value="all"; sort.value="reco";
+  render();
+});
+
+reloadRank.addEventListener("click", refreshMonthlyRanking);
 
 useLoc.addEventListener("click", async () => {
-  if(!navigator.geolocation){
-    alert("이 브라우저는 위치 기능이 없데이(=없음).");
-    return;
-  }
+  if(!navigator.geolocation){ alert("이 브라우저는 위치 기능이 없데이(=없음)."); return; }
   useLoc.disabled = true;
   useLoc.textContent = "📍 위치 가져오는 중...";
   navigator.geolocation.getCurrentPosition(
@@ -414,90 +427,13 @@ useLoc.addEventListener("click", async () => {
       updateLocPill();
       render();
     },
-    (err)=>{
+    ()=>{
       useLoc.disabled = false;
       useLoc.textContent = "📍 내 위치 사용";
-      alert("위치 권한이 막혔거나 실패했데이. 브라우저 주소창 옆 🔒에서 권한 허용해보이소.");
-      console.warn(err);
+      alert("위치 권한이 막혔거나 실패했데이. 주소창 옆 🔒에서 권한 허용해보이소.");
     },
     { enableHighAccuracy:true, timeout: 8000 }
   );
-});
-
-addDemo.addEventListener("click", () => {
-  const ids = new Set(places.map(p=>p.id));
-  let added = 0;
-  seed.forEach(p=>{
-    if(!ids.has(p.id)){
-      places.push(structPlace(p));
-      added++;
-    }
-  });
-  if(added){
-    savePlaces();
-    render();
-  }else{
-    alert("데모는 이미 들어가 있데이(=있음).");
-  }
-});
-
-addPlace.addEventListener("click", () => openForm(null));
-
-reset.addEventListener("click", () => {
-  q.value = "";
-  cat.value = "all";
-  sort.value = "reco";
-  setTab("all", true);
-  render();
-});
-
-exportBtn.addEventListener("click", () => {
-  const payload = {
-    version: 2,
-    exportedAt: new Date().toISOString(),
-    places,
-    favs: [...favs],
-    recent
-  };
-  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "matzip-picks-data.json";
-  a.click();
-  URL.revokeObjectURL(url);
-});
-
-importBtn.addEventListener("click", () => importFile.click());
-
-importFile.addEventListener("change", async () => {
-  const file = importFile.files?.[0];
-  if(!file) return;
-  try{
-    const text = await file.text();
-    const data = JSON.parse(text);
-
-    // Accept either full export or places array
-    if(Array.isArray(data)){
-      places = data.map(structPlace);
-    }else if(data && Array.isArray(data.places)){
-      places = data.places.map(structPlace);
-      if(Array.isArray(data.favs)) favs = new Set(data.favs);
-      if(Array.isArray(data.recent)) recent = data.recent;
-      saveSet(LS_FAVS, favs);
-      saveArray(LS_RECENT, recent);
-    }else{
-      throw new Error("형식이 다름");
-    }
-    savePlaces();
-    alert("가져오기 완료! 지렸다잉(=끝내줌).");
-    render();
-  }catch(e){
-    alert("JSON 읽기 실패… 파일 형식 확인해주이소.");
-    console.warn(e);
-  }finally{
-    importFile.value = "";
-  }
 });
 
 // Detail modal close
@@ -509,16 +445,10 @@ closeForm.addEventListener("click", closeFormModal);
 fCancel.addEventListener("click", closeFormModal);
 formBackdrop.addEventListener("click", (e)=>{ if(e.target===formBackdrop) closeFormModal(); });
 
+// Save form
 fSave.addEventListener("click", () => {
   const data = readForm();
-  if(!data.name.trim()){
-    alert("가게명은 필수다 코노야로.");
-    return;
-  }
-  if(!data.cat){
-    alert("카테고리도 필수!");
-    return;
-  }
+  if(!data.name.trim()){ alert("가게명은 필수다 코노야로."); return; }
 
   if(editingId){
     const idx = places.findIndex(p=>p.id===editingId);
@@ -527,7 +457,7 @@ fSave.addEventListener("click", () => {
       savePlaces();
       closeFormModal();
       render();
-      openDetail(editingId); // 바로 확인
+      openDetail(editingId);
     }
   }else{
     const id = "p_" + Math.random().toString(36).slice(2,10);
@@ -538,7 +468,29 @@ fSave.addEventListener("click", () => {
   }
 });
 
-// Detail actions
+// Delete
+delBtn.addEventListener("click", () => {
+  const p = getById(selectedId);
+  if(!p) return;
+  if(!confirm(`"${p.name}" 진짜 삭제할끼? (복구 안 됨)`)) return;
+  places = places.filter(x=>x.id!==p.id);
+  favs.delete(p.id);
+  recent = recent.filter(id=>id!==p.id);
+  savePlaces(); saveSet(LS_FAVS, favs); saveArray(LS_RECENT, recent);
+  closeDetailModal();
+  render();
+  refreshMonthlyRanking();
+});
+
+// Edit
+editBtn.addEventListener("click", () => {
+  const p = getById(selectedId);
+  if(!p) return;
+  closeDetailModal(false);
+  openForm(p);
+});
+
+// Copy
 copyBtn.addEventListener("click", async () => {
   const p = getById(selectedId);
   if(!p) return;
@@ -552,97 +504,67 @@ copyBtn.addEventListener("click", async () => {
 가격대: ${p.price||"-"}
 영업: ${p.hours||"-"}
 좌표: ${p.lat ?? "-"}, ${p.lng ?? "-"}`;
-  try{
-    await navigator.clipboard.writeText(text);
-    copyBtn.textContent = "복사됨!";
-    setTimeout(()=>copyBtn.textContent="정보 복사", 900);
-  }catch{
-    alert("복사 실패… 브라우저 권한 확인해주이소.");
-  }
+  try{ await navigator.clipboard.writeText(text); alert("복사 완료!"); }
+  catch{ alert("복사 실패… 브라우저 권한 확인해주이소."); }
 });
 
-editBtn.addEventListener("click", () => {
-  const p = getById(selectedId);
-  if(!p) return;
-  closeDetailModal(false);
-  openForm(p);
-});
-
-delBtn.addEventListener("click", () => {
-  const p = getById(selectedId);
-  if(!p) return;
-  const ok = confirm(`"${p.name}" 진짜 삭제할끼? (복구 안 됨)`);
-  if(!ok) return;
-  places = places.filter(x=>x.id!==p.id);
-  favs.delete(p.id);
-  recent = recent.filter(id=>id!==p.id);
-  savePlaces(); saveSet(LS_FAVS, favs); saveArray(LS_RECENT, recent);
-  closeDetailModal();
-  render();
-});
-
-// Maps (no API; just search)
+// Maps
 mapKakao.addEventListener("click", ()=>openMap("kakao"));
 mapNaver.addEventListener("click", ()=>openMap("naver"));
 mapGoogle.addEventListener("click", ()=>openMap("google"));
 
-// --- Init
-updateLocPill();
-render();
+// Like (shared monthly)
+likeThisMonth.addEventListener("click", likeMonthly);
 
 /* ============================
-   Helpers & Core Logic
+   5) Init
    ============================ */
+updateLocPill();
+render();
+refreshMonthlyRanking();
 
-function setTab(tab, silent){
-  activeTab = tab;
-  tabAll.classList.toggle("on", tab==="all");
-  tabReco.classList.toggle("on", tab==="reco");
-  tabFav.classList.toggle("on", tab==="fav");
-  tabRecent.classList.toggle("on", tab==="recent");
-
-  // Tab default sort hint
-  if(!silent){
-    if(tab==="reco") sort.value = "reco";
-    if(tab==="fav") sort.value = "reco";
-    if(tab==="recent") sort.value = "new";
-  }
-  render();
+/* ============================
+   6) Core functions
+   ============================ */
+function ymNow(){
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,"0");
+  return `${y}-${m}`;
 }
 
 function loadPlaces(){
   const raw = loadJSON(LS_PLACES, null);
-  if(raw && Array.isArray(raw)) return raw.map(structPlace);
-  return [];
+  return raw && Array.isArray(raw) ? raw.map(structPlace) : [];
 }
 function savePlaces(){ saveJSON(LS_PLACES, places); }
 
 function loadJSON(key, fallback){
-  try{
-    const raw = localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : fallback;
-  }catch{ return fallback; }
+  try{ const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }
+  catch{ return fallback; }
 }
 function saveJSON(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
 
 function loadSet(key){
-  try{
-    const raw = localStorage.getItem(key);
-    return raw ? new Set(JSON.parse(raw)) : new Set();
-  }catch{ return new Set(); }
+  try{ const raw = localStorage.getItem(key); return raw ? new Set(JSON.parse(raw)) : new Set(); }
+  catch{ return new Set(); }
 }
 function saveSet(key, set){ localStorage.setItem(key, JSON.stringify([...set])); }
 
 function loadArray(key){
-  try{
-    const raw = localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : [];
-  }catch{ return []; }
+  try{ const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : []; }
+  catch{ return []; }
 }
 function saveArray(key, arr){ localStorage.setItem(key, JSON.stringify(arr)); }
 
+function numOrNull(v){
+  if(v===null || v===undefined || v==="") return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+function clamp(n,a,b){ return Math.max(a, Math.min(b,n)); }
+
 function structPlace(p){
-  // Normalize / ensure fields
   const tags = Array.isArray(p.tags) ? p.tags : (typeof p.tags==="string" ? p.tags.split(",").map(s=>s.trim()).filter(Boolean) : []);
   const score = numOrNull(p.score);
   const lat = numOrNull(p.lat);
@@ -664,13 +586,6 @@ function structPlace(p){
   };
 }
 
-function numOrNull(v){
-  if(v===null || v===undefined || v==="") return null;
-  const n = Number(v);
-  return Number.isFinite(n) ? n : null;
-}
-function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
-
 function fmtScore(s){
   const n = Number(s);
   if(!Number.isFinite(n)) return "-";
@@ -688,7 +603,6 @@ function updateLocPill(){
 function getById(id){ return places.find(p=>p.id===id); }
 
 function distanceKm(aLat, aLng, bLat, bLng){
-  // Haversine
   const R = 6371;
   const toRad = (d)=>d*Math.PI/180;
   const dLat = toRad(bLat - aLat);
@@ -700,21 +614,15 @@ function distanceKm(aLat, aLng, bLat, bLng){
 }
 
 function calcRecoScore(p){
-  // 추천 점수: 평점(0~5) * 20 + 즐겨찾기 + 최근본 + 거리(가까울수록 가점)
   let score = (p.score ?? 0) * 20;
-
-  if(favs.has(p.id)) score += 18;            // fav boost
+  if(favs.has(p.id)) score += 12;
   const idx = recent.indexOf(p.id);
-  if(idx >= 0) score += Math.max(0, 14 - idx*2); // 최근본 boost (앞에 있을수록 큼)
-
-  // 거리 가점: 0~5km = +15, 5~20km = +8, 20km~ = +0 (좌표 있을 때만)
+  if(idx >= 0) score += Math.max(0, 10 - idx*2);
   if(myLoc && p.lat!=null && p.lng!=null){
     const km = distanceKm(myLoc.lat, myLoc.lng, p.lat, p.lng);
-    if(km <= 5) score += 15;
-    else if(km <= 20) score += 8;
+    if(km <= 5) score += 12;
+    else if(km <= 20) score += 6;
   }
-
-  // 태그 다양성/충실도 살짝
   if((p.tags||[]).length >= 3) score += 2;
   return score;
 }
@@ -722,45 +630,31 @@ function calcRecoScore(p){
 function matchesFilters(p){
   const keyword = q.value.trim().toLowerCase();
   const inCat = (cat.value === "all") || (p.cat === cat.value);
-
   const inQ = !keyword || (
     (p.name||"").toLowerCase().includes(keyword) ||
     (p.addr||"").toLowerCase().includes(keyword) ||
     (p.tags||[]).some(t => (t||"").toLowerCase().includes(keyword))
   );
-
-  // Tab filters
-  let inTab = true;
-  if(activeTab === "fav") inTab = favs.has(p.id);
-  if(activeTab === "recent") inTab = recent.includes(p.id);
-  // reco tab uses all but sorts by reco (still filter by query/cat)
-  return inCat && inQ && inTab;
+  return inCat && inQ;
 }
 
 function sortList(list){
   const v = sort.value;
-
   if(v === "name") return list.sort((a,b)=> (a.name||"").localeCompare(b.name||"", "ko"));
   if(v === "new")  return list.sort((a,b)=> (b.addedAt||0) - (a.addedAt||0));
   if(v === "score")return list.sort((a,b)=> (b.score||0) - (a.score||0));
-
   if(v === "near"){
-    // If no location/coords, push to bottom
     return list.sort((a,b)=>{
       const ak = (myLoc && a.lat!=null && a.lng!=null) ? distanceKm(myLoc.lat, myLoc.lng, a.lat, a.lng) : Infinity;
       const bk = (myLoc && b.lat!=null && b.lng!=null) ? distanceKm(myLoc.lat, myLoc.lng, b.lat, b.lng) : Infinity;
       return ak - bk;
     });
   }
-
-  // default reco
   return list.sort((a,b)=> calcRecoScore(b) - calcRecoScore(a));
 }
 
 function render(){
-  const filtered = places.filter(matchesFilters);
-  const list = sortList(filtered);
-
+  const list = sortList(places.filter(matchesFilters));
   countPill.textContent = `${list.length} places`;
   grid.innerHTML = "";
   empty.style.display = list.length ? "none" : "block";
@@ -783,11 +677,9 @@ function render(){
     meta.className = "meta";
     meta.append(tag(p.cat || "기타"));
 
-    // tags preview
     const tPreview = (p.tags||[]).slice(0,2).join(" · ");
     if(tPreview) meta.append(tag(tPreview));
 
-    // distance preview if possible
     if(myLoc && p.lat!=null && p.lng!=null){
       const km = distanceKm(myLoc.lat, myLoc.lng, p.lat, p.lng);
       const kmTag = tag(`${km.toFixed(1)}km`);
@@ -795,18 +687,12 @@ function render(){
       meta.append(kmTag);
     }
 
-    // reco preview on reco tab or reco sort
-    if(sort.value==="reco" || activeTab==="reco"){
-      const rs = calcRecoScore(p);
-      meta.append(tag(`추천 ${Math.round(rs)}`));
-    }
-
+    meta.append(tag(`추천 ${Math.round(calcRecoScore(p))}`));
     left.append(name, meta);
 
     const right = document.createElement("div");
     right.className = "score";
     right.innerHTML = `${fmtScore(p.score)} <small>/5</small>`;
-
     top.append(left, right);
 
     const desc = document.createElement("div");
@@ -855,7 +741,6 @@ function openDetail(id){
   if(!p) return;
   selectedId = id;
 
-  // push to recent
   recent = recent.filter(x=>x!==id);
   recent.unshift(id);
   recent = recent.slice(0, 20);
@@ -870,16 +755,12 @@ function openDetail(id){
     `평점: ${fmtScore(p.score)}`,
     `태그: ${(p.tags||[]).join(", ") || "-"}`
   ];
-
   if(myLoc && p.lat!=null && p.lng!=null){
     const km = distanceKm(myLoc.lat, myLoc.lng, p.lat, p.lng);
     bits.push(`거리: ${km.toFixed(2)} km`);
   }else{
     bits.push(`거리: (좌표/위치 필요)`);
   }
-
-  bits.push(`추천 점수: ${Math.round(calcRecoScore(p))}`);
-
   bits.forEach(b=>{
     const span = document.createElement("span");
     span.className = "tag";
@@ -904,24 +785,15 @@ function openMap(provider){
   const p = getById(selectedId);
   if(!p) return;
   const query = encodeURIComponent((p.name||"") + " " + (p.addr||""));
-
-  if(provider==="google"){
-    window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, "_blank");
-    return;
-  }
-  if(provider==="naver"){
-    window.open(`https://map.naver.com/v5/search/${query}`, "_blank");
-    return;
-  }
-  // kakao
-  window.open(`https://map.kakao.com/?q=${query}`, "_blank");
+  if(provider==="google") return window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, "_blank");
+  if(provider==="naver")  return window.open(`https://map.naver.com/v5/search/${query}`, "_blank");
+  return window.open(`https://map.kakao.com/?q=${query}`, "_blank");
 }
 
 function openForm(placeOrNull){
   editingId = placeOrNull?.id ?? null;
   fTitle.textContent = editingId ? "맛집 수정" : "맛집 추가";
 
-  // fill
   fName.value = placeOrNull?.name ?? "";
   fCat.value  = placeOrNull?.cat ?? "기타";
   fTags.value = (placeOrNull?.tags ?? []).join(", ");
@@ -956,6 +828,77 @@ function readForm(){
     lat:  (fLat.value===""? null : Number(fLat.value)),
     lng:  (fLng.value===""? null : Number(fLng.value))
   };
+}
+
+/* ============================
+   7) Monthly Like Ranking (shared)
+   ============================ */
+async function refreshMonthlyRanking(){
+  const month = ymNow();
+  monthlyMonth.textContent = `${month} 기준 · 모두의 좋아요 합산`;
+  if(!LIKE_API_URL || LIKE_API_URL.includes("PASTE_YOUR")){
+    monthlyList.textContent = "⚠️ LIKE_API_URL이 비어있음. Apps Script 웹앱 URL 넣어야 랭킹 뜸.";
+    return;
+  }
+  try{
+    const url = `${LIKE_API_URL}?action=rank&month=${encodeURIComponent(month)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if(!data.ok) throw new Error(data.error || "rank failed");
+
+    const top = (data.ranking || []).slice(0,10).map((r, i) => {
+      const p = places.find(x=>x.id===r.placeId);
+      const name = p ? p.name : `(없는 맛집: ${r.placeId})`;
+      return `${i+1}위 · ${name} — ${r.likes}❤️`;
+    });
+
+    monthlyList.textContent = top.length ? top.join("\n") : "아직 좋아요가 없다… 1등은 니가 만든다 😎";
+    monthlyList.style.whiteSpace = "pre-line";
+  }catch(e){
+    monthlyList.textContent = "랭킹 불러오기 실패… (웹앱 URL/배포 권한/시트 탭 이름) 확인";
+    console.warn(e);
+  }
+}
+
+async function likeMonthly(){
+  const p = getById(selectedId);
+  if(!p) return;
+
+  if(!LIKE_API_URL || LIKE_API_URL.includes("PASTE_YOUR")){
+    alert("LIKE_API_URL부터 넣어야 함! (Apps Script 웹앱 URL)");
+    return;
+  }
+
+  const month = ymNow();
+  const key = `liked_${month}_${p.id}`; // 브라우저당 월1회/가게(최소 방지)
+  if(localStorage.getItem(key)){
+    alert("이번 달에 이 가게는 이미 좋아요 했다 아이가 😅");
+    return;
+  }
+
+  try{
+    likeThisMonth.disabled = true;
+    likeThisMonth.textContent = "❤️ 반영중...";
+
+    const res = await fetch(LIKE_API_URL, {
+      method: "POST",
+      headers: {"Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"},
+      body: JSON.stringify({ placeId: p.id, month })
+    });
+    const data = await res.json();
+    if(!data.ok) throw new Error(data.error || "like failed");
+
+    localStorage.setItem(key, "1");
+    alert(`좋아요 완료! 현재 ${data.likes}❤️ (이번 달)`);
+
+    await refreshMonthlyRanking();
+  }catch(e){
+    alert("좋아요 실패… (웹앱 URL/배포 권한/시트 탭 이름) 확인해보이소.");
+    console.warn(e);
+  }finally{
+    likeThisMonth.disabled = false;
+    likeThisMonth.textContent = "❤️ 좋아요";
+  }
 }
 </script>
 </body>
