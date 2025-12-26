@@ -861,8 +861,18 @@ async function refreshMonthlyRanking(){
 }
 
 async function likeMonthly(){
-  const p = getById(selectedId);
-  if(!p) return;
+  // ✅ 선택된 맛집이 없으면 바로 컷
+  if(!selectedId){
+    alert("먼저 맛집 '상세보기'를 열고 ❤️를 눌러야 한다 아이가.");
+    return;
+  }
+
+  const p = places.find(x => x.id === selectedId);
+  if(!p || !p.id){
+    alert("placeId를 못 찾았다… (데이터 id 확인 필요)");
+    console.log("DEBUG selectedId=", selectedId, "place=", p);
+    return;
+  }
 
   if(!LIKE_API_URL || LIKE_API_URL.includes("PASTE_YOUR")){
     alert("LIKE_API_URL부터 넣어야 함! (Apps Script 웹앱 URL)");
@@ -870,7 +880,7 @@ async function likeMonthly(){
   }
 
   const month = ymNow();
-  const key = `liked_${month}_${p.id}`; // 브라우저당 월1회/가게(최소 방지)
+  const key = `liked_${month}_${p.id}`;
   if(localStorage.getItem(key)){
     alert("이번 달에 이 가게는 이미 좋아요 했다 아이가 😅");
     return;
@@ -880,11 +890,13 @@ async function likeMonthly(){
     likeThisMonth.disabled = true;
     likeThisMonth.textContent = "❤️ 반영중...";
 
+    // ✅ 폼 전송 (placeId/month 확실히 전달)
     const res = await fetch(LIKE_API_URL, {
       method: "POST",
-      headers: {"Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"},
-      body: JSON.stringify({ placeId: p.id, month })
+      headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+      body: new URLSearchParams({ placeId: p.id, month })
     });
+
     const data = await res.json();
     if(!data.ok) throw new Error(data.error || "like failed");
 
@@ -900,6 +912,7 @@ async function likeMonthly(){
     likeThisMonth.textContent = "❤️ 좋아요";
   }
 }
+
 </script>
 </body>
 </html>
