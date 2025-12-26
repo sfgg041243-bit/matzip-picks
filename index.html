@@ -4,292 +4,458 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Matzip Picks</title>
+  <meta name="description" content="이달의 맛집 TOP10 (❤️ 좋아요 합산) - 맛집 추천 리스트" />
   <style>
     :root{
-      --bg:#0b1020;
-      --card:#121a33;
-      --card2:#0f162d;
-      --line:rgba(255,255,255,.10);
-      --text:#eaf0ff;
-      --muted:rgba(234,240,255,.72);
-      --accent:#7dd3fc;
-      --accent2:#a7f3d0;
-      --danger:#fb7185;
-      --shadow: 0 12px 40px rgba(0,0,0,.35);
-      --radius:16px;
+      --bg0:#070A12;
+      --bg1:#0B1020;
+      --line:rgba(255,255,255,.12);
+      --line2:rgba(255,255,255,.08);
+      --text:#ECF2FF;
+      --muted:rgba(236,242,255,.72);
+      --muted2:rgba(236,242,255,.55);
+      --accent:#7DD3FC;
+      --accent2:#A7F3D0;
+      --pink:#FB7185;
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --radius:18px;
+      --radius2:24px;
+      --ring: 0 0 0 3px rgba(125,211,252,.22);
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Apple SD Gothic Neo, Noto Sans KR, "Helvetica Neue", Arial;
     }
     *{box-sizing:border-box}
+    html,body{height:100%}
     body{
       margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Apple SD Gothic Neo, Noto Sans KR, "Helvetica Neue", Arial, "Apple Color Emoji","Segoe UI Emoji";
-      background: radial-gradient(900px 450px at 20% 0%, rgba(125,211,252,.18), transparent 60%),
-                  radial-gradient(900px 450px at 80% 0%, rgba(167,243,208,.14), transparent 60%),
-                  var(--bg);
+      font-family:var(--font);
       color:var(--text);
+      background:
+        radial-gradient(900px 500px at 20% 0%, rgba(125,211,252,.18), transparent 60%),
+        radial-gradient(900px 500px at 80% 0%, rgba(167,243,208,.14), transparent 60%),
+        radial-gradient(1200px 700px at 50% 120%, rgba(251,113,133,.08), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
     }
-    .wrap{max-width:1100px;margin:0 auto;padding:18px}
-    .topbar{
-      display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between;
-      margin-bottom:14px;
+    .wrap{max-width:1180px;margin:0 auto;padding:18px}
+    .top{
+      display:flex;gap:14px;align-items:flex-start;justify-content:space-between;
+      flex-wrap:wrap;margin-bottom:14px;
     }
-    .brand{
-      display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.2px;
+    .brand{display:flex;gap:12px;align-items:center;min-width:280px}
+    .logo{
+      width:44px;height:44px;border-radius:14px;
+      display:grid;place-items:center;
+      background:linear-gradient(135deg, rgba(125,211,252,.26), rgba(167,243,208,.14));
+      border:1px solid rgba(125,211,252,.25);
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      font-size:20px;
     }
-    .brand .logo{font-size:20px}
-    .pill{
+    .brand h1{margin:0;font-size:18px;letter-spacing:.2px}
+    .brand .sub{margin-top:4px;font-size:12px;color:var(--muted)}
+    .actionsbar{
+      flex:1;
+      display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;align-items:center;
+    }
+    .chip{
+      display:flex;align-items:center;gap:8px;
+      padding:10px 12px;border-radius:999px;
       border:1px solid var(--line);
       background:rgba(255,255,255,.03);
-      border-radius:999px;
-      padding:8px 10px;
-      display:flex;gap:8px;align-items:center;
+      backdrop-filter: blur(10px);
     }
-    input, select, textarea, button{
-      font:inherit;
+    .chip input{
+      width:320px;max-width:58vw;
+      border:none;outline:none;background:transparent;padding:0;
       color:var(--text);
     }
-    input, select, textarea{
+    .chip input::placeholder{color:rgba(236,242,255,.45)}
+
+    select, input, textarea, button{font:inherit;color:var(--text)}
+    input, textarea{
       background:rgba(255,255,255,.04);
       border:1px solid var(--line);
-      border-radius:12px;
+      border-radius:14px;
       padding:10px 12px;
       outline:none;
     }
-    textarea{min-height:88px;resize:vertical}
-    button{
-      background:rgba(255,255,255,.06);
-      border:1px solid var(--line);
-      border-radius:12px;
+    input:focus, textarea:focus{box-shadow:var(--ring);border-color:rgba(125,211,252,.35)}
+
+    /* ✅ select 가독성 (요구사항 #2) */
+    select{
+      background:rgba(0,0,0,.35);
+      border:1px solid rgba(255,255,255,.16);
+      border-radius:14px;
       padding:10px 12px;
-      cursor:pointer;
-      transition:.15s transform, .15s background;
+      outline:none;
+      color:var(--text);
     }
-    button:hover{background:rgba(255,255,255,.10)}
+    select:focus{box-shadow:var(--ring);border-color:rgba(125,211,252,.35)}
+    option{background:#0B1020;color:#ECF2FF}
+
+    textarea{min-height:96px;resize:vertical}
+
+    button{
+      cursor:pointer;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.05);
+      border-radius:14px;
+      padding:10px 12px;
+      transition: .16s transform, .16s background, .16s border-color;
+      white-space:nowrap; /* ✅ #3 버튼 텍스트 줄바꿈 방지 */
+    }
+    button:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.16)}
     button:active{transform:scale(.98)}
     .btn-primary{
-      background:linear-gradient(135deg, rgba(125,211,252,.25), rgba(167,243,208,.18));
+      background:linear-gradient(135deg, rgba(125,211,252,.26), rgba(167,243,208,.14));
       border-color:rgba(125,211,252,.35);
     }
-    .btn-danger{border-color:rgba(251,113,133,.35);background:rgba(251,113,133,.08)}
+    .btn-danger{
+      background:rgba(251,113,133,.10);
+      border-color:rgba(251,113,133,.35);
+    }
+
     .grid{
       display:grid;
-      grid-template-columns: 1.2fr .8fr;
+      grid-template-columns: 1.6fr .9fr;
       gap:14px;
+      align-items:start;
     }
-    @media (max-width:960px){
-      .grid{grid-template-columns:1fr}
-    }
-    .card{
-      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
+    @media (max-width:980px){.grid{grid-template-columns:1fr}}
+
+    .panel{
       border:1px solid var(--line);
-      border-radius:var(--radius);
+      border-radius:var(--radius2);
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
       box-shadow:var(--shadow);
       overflow:hidden;
     }
-    .card .hd{
-      display:flex;justify-content:space-between;align-items:center;
-      padding:14px 14px 10px;
-      border-bottom:1px solid var(--line);
-      background:rgba(0,0,0,.12);
+    .panel .hd{
+      padding:14px 14px 12px;
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      border-bottom:1px solid var(--line2);
+      background:rgba(0,0,0,.14);
     }
-    .card .bd{padding:14px}
-    .muted{color:var(--muted)}
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .row > *{flex:1}
-    .row .tight{flex:0 0 auto}
-    .places{
+    .panel .hd .title{display:flex;flex-direction:column;gap:4px}
+    .panel .hd .title b{font-size:14px;letter-spacing:.2px}
+    .panel .hd .title span{font-size:12px;color:var(--muted)}
+    .panel .bd{padding:14px}
+
+    .hint{
+      display:flex;gap:10px;flex-wrap:wrap;align-items:center;
+      padding:10px 12px;border:1px solid var(--line2);
+      border-radius:16px;background:rgba(0,0,0,.16);
+      color:var(--muted);font-size:12px;line-height:1.4;
+      margin-bottom:12px;
+    }
+    .hint .dot{width:8px;height:8px;border-radius:99px;background:rgba(167,243,208,.85)}
+    .hint .dot2{background:rgba(125,211,252,.85)}
+    .hint .dot3{background:rgba(251,113,133,.75)}
+
+    .cards{
       display:grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap:12px;
     }
-    @media (max-width:960px){.places{grid-template-columns:repeat(2, minmax(0,1fr))}}
-    @media (max-width:560px){.places{grid-template-columns:1fr}}
-    .place{
-      background:rgba(0,0,0,.18);
-      border:1px solid var(--line);
+    @media (max-width:980px){.cards{grid-template-columns: repeat(2, minmax(0,1fr))}}
+    @media (max-width:560px){.cards{grid-template-columns:1fr}}
+
+    /* ✅ #3 카드 크기 통일 */
+    .card{
+      border:1px solid var(--line2);
       border-radius:var(--radius);
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,.10));
       padding:14px;
-      display:flex;flex-direction:column;gap:8px;
+      display:flex;flex-direction:column;gap:9px;
+      position:relative;
+      overflow:hidden;
+      min-height: 270px;
     }
-    .badge{font-size:12px;padding:4px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
-    .title{font-weight:800;font-size:18px}
-    .meta{display:flex;gap:8px;flex-wrap:wrap}
-    .kv{display:flex;gap:6px;flex-wrap:wrap;color:var(--muted);font-size:13px}
-    .actions{display:flex;gap:8px;margin-top:6px}
-    .actions button{flex:1}
-    .top10line{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px dashed rgba(255,255,255,.14)}
-    .top10line:last-child{border-bottom:none}
-    .top10left b{margin-right:6px}
-    /* modal */
-    .backdrop{
-      position:fixed;inset:0;background:rgba(0,0,0,.55);
-      display:none;align-items:center;justify-content:center;padding:18px;
+    .card:before{
+      content:"";
+      position:absolute;inset:-2px;
+      background:
+        radial-gradient(600px 280px at 30% 0%, rgba(125,211,252,.14), transparent 55%),
+        radial-gradient(600px 280px at 80% 10%, rgba(167,243,208,.10), transparent 55%);
+      opacity:.55;pointer-events:none;
+    }
+    .card > *{position:relative}
+
+    .badges{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .badge{
+      font-size:12px;
+      padding:5px 9px;
+      border-radius:999px;
+      border:1px solid var(--line2);
+      background:rgba(0,0,0,.12);
+      color:var(--muted);
+      white-space:nowrap;
+    }
+    .badge.saved{border-color:rgba(167,243,208,.30);color:var(--accent2)}
+    .name{font-size:18px;font-weight:820;letter-spacing:.1px;line-height:1.15}
+    .meta{display:flex;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:12.5px}
+    .meta b{color:var(--text)}
+    .tags{color:var(--muted2);font-size:12px;display:flex;gap:7px;flex-wrap:wrap}
+    .tag{padding:4px 8px;border:1px solid var(--line2);border-radius:999px;background:rgba(0,0,0,.12);white-space:nowrap}
+
+    /* ✅ #4 브레이크 -> 브레이크 타임 */
+    .desc{
+      color:rgba(236,242,255,.78);
+      font-size:13.2px;line-height:1.5;
+      flex:1;
+      min-height: 48px;
+    }
+
+    /* ✅ #3 하단 버튼 일자 정렬 + 동일 높이 + 저장됨 1줄 */
+    .btns{display:flex;gap:9px;margin-top:6px;align-items:stretch}
+    .btns button{
+      flex:1;
+      height:42px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 12px;
+      min-width:0;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .toplist{display:flex;flex-direction:column;gap:10px}
+    .topitem{
+      padding:10px 12px;
+      border:1px solid var(--line2);
+      border-radius:16px;
+      background:rgba(0,0,0,.14);
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+    }
+    .rankleft{display:flex;align-items:center;gap:10px;min-width:0}
+    .rankno{
+      width:30px;height:30px;border-radius:10px;
+      display:grid;place-items:center;
+      border:1px solid var(--line2);
+      background:rgba(255,255,255,.03);
+      color:var(--muted);
+      font-weight:800;
+      flex:0 0 auto;
+    }
+    .rankname{
+      min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+      font-weight:750;
+    }
+    .ranklikes{font-weight:850}
+    .small{font-size:12px;color:var(--muted)}
+    .muted{color:var(--muted)}
+    .footnote{margin-top:10px;color:var(--muted);font-size:12px;line-height:1.45}
+
+    /* ✅ #1 모달 투명도 제거 */
+    .overlay{
+      position:fixed;inset:0;
+      display:none;align-items:center;justify-content:center;
+      background:rgba(0,0,0,.62);
+      padding:18px;
+      z-index:50;
     }
     .modal{
-      width:min(760px, 100%);
-      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      border:1px solid var(--line);
-      border-radius:18px;
+      width:min(820px, 100%);
+      border-radius:22px;
+      border:1px solid rgba(255,255,255,.14);
+      background:#0C1224;
       box-shadow:var(--shadow);
       overflow:hidden;
     }
-    .modal .hd{padding:14px 14px 10px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
-    .modal .bd{padding:14px}
-    .modal .ft{padding:14px;border-top:1px solid var(--line);display:flex;gap:10px}
-    .kvs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    @media (max-width:640px){.kvs{grid-template-columns:1fr}}
-    .kvbox{padding:10px 12px;border:1px solid var(--line);border-radius:14px;background:rgba(0,0,0,.18)}
-    .kvbox .k{font-size:12px;color:var(--muted);margin-bottom:6px}
-    .kvbox .v{font-weight:700}
-    .small{font-size:12px;color:var(--muted)}
-    .ok{color:var(--accent2)}
-    .warn{color:var(--danger)}
+    .modal .hd{
+      padding:14px 14px 10px;
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      background:#0B1020;
+    }
+    .modal .hd .left{min-width:0}
+    .modal .hd .left .mname{font-size:18px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .modal .hd .left .msub{margin-top:4px;font-size:12px;color:var(--muted)}
+    .modal .bd{padding:14px;background:#0C1224}
+    .modal .ft{
+      padding:14px;border-top:1px solid rgba(255,255,255,.10);
+      display:flex;gap:10px;background:#0B1020;
+    }
+    .modal .ft button{flex:1}
+    .btn-like{
+      background:linear-gradient(135deg, rgba(251,113,133,.18), rgba(125,211,252,.14));
+      border-color:rgba(251,113,133,.35);
+    }
+    .btn-save{
+      background:linear-gradient(135deg, rgba(167,243,208,.18), rgba(125,211,252,.10));
+      border-color:rgba(167,243,208,.30);
+    }
+    .kvgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media (max-width:640px){.kvgrid{grid-template-columns:1fr}}
+    .kv{
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:16px;
+      background:#0B1020;
+      padding:10px 12px;
+    }
+    .kv .k{font-size:11px;color:var(--muted);margin-bottom:6px}
+    .kv .v{font-weight:750}
+    .review{
+      margin-top:10px;border:1px solid rgba(255,255,255,.10);
+      border-radius:16px;background:#0B1020;padding:12px;
+    }
+    .review .k{font-size:11px;color:var(--muted);margin-bottom:8px}
+    .review .v{font-weight:650;line-height:1.55;color:rgba(236,242,255,.86)}
+
+    .formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media (max-width:700px){.formgrid{grid-template-columns:1fr}}
+    .formgrid .full{grid-column:1/-1}
+
+    .toast{
+      position:fixed;left:50%;bottom:18px;transform:translateX(-50%);
+      background:rgba(0,0,0,.78);
+      border:1px solid rgba(255,255,255,.12);
+      padding:10px 12px;border-radius:14px;
+      color:var(--text);
+      display:none;
+      z-index:60;
+      box-shadow: 0 14px 40px rgba(0,0,0,.35);
+      font-size:13px;
+      backdrop-filter: blur(10px);
+    }
   </style>
 </head>
+
 <body>
   <div class="wrap">
-    <div class="topbar">
+    <div class="top">
       <div class="brand">
         <div class="logo">🍜</div>
         <div>
-          <div style="font-size:18px;">Matzip Picks</div>
-          <div class="small">이달의 맛집 TOP10(❤️ 좋아요 합산) · 개인 저장은 브라우저 로컬</div>
+          <h1>Matzip Picks</h1>
+          <div class="sub">이달 TOP10(❤️ 좋아요 합산) · ⭐ 저장은 내 브라우저</div>
         </div>
       </div>
-      <div class="row" style="justify-content:flex-end;gap:10px;flex:1">
-        <div class="pill" style="min-width:260px;flex:1">
-          🔎 <input id="q" placeholder="검색: 상호/카테고리/태그 (예: 성수, 파스타, 혼밥)" style="border:none;background:transparent;padding:0;flex:1" />
+
+      <div class="actionsbar">
+        <div class="chip">
+          🔎
+          <input id="q" placeholder="검색: 상호/카테고리/태그/브레이크 타임" />
         </div>
-        <select id="cat" class="tight">
+
+        <select id="cat">
           <option value="">카테고리: 전체</option>
           <option>한식</option><option>일식</option><option>중식</option><option>양식</option><option>분식</option>
           <option>카페</option><option>술집</option><option>디저트</option><option>기타</option>
         </select>
-        <select id="sort" class="tight">
+
+        <select id="sort">
           <option value="rec">정렬: 추천순</option>
           <option value="rate">정렬: 평점순</option>
           <option value="new">정렬: 최신순</option>
         </select>
-        <button id="openAdd" class="btn-primary tight">+ 맛집 추가</button>
-        <button id="addDemo" class="tight">+ 데모 3개 추가</button>
-        <button id="reset" class="btn-danger tight">리셋</button>
+
+        <button id="openAdd" class="btn-primary">+ 맛집 추가</button>
+        <button id="addDemo">+ 데모 3개</button>
+        <button id="reset" class="btn-danger">리셋</button>
       </div>
     </div>
 
     <div class="grid">
-      <!-- Left: list -->
-      <div class="card">
+      <section class="panel">
         <div class="hd">
-          <div><b>🍽️ 맛집 리스트</b> <span class="muted" id="count"></span></div>
-          <div class="small">⭐ 저장은 내 브라우저만. ❤️ 좋아요는 모두 합산(구글시트)</div>
+          <div class="title">
+            <b>🍽️ 맛집 리스트</b>
+            <span id="count">0 places</span>
+          </div>
+          <div class="small">❤️ = 구글시트 합산 / ⭐ = 내 브라우저 저장</div>
         </div>
         <div class="bd">
-          <div class="places" id="places"></div>
+          <div class="hint">
+            <span class="dot"></span> ❤️는 “상세보기”에서 누르면 TOP10에 반영됨
+            <span class="dot2"></span> 브레이크 타임 입력 가능 (없으면 “없음/미기입”)
+            <span class="dot3"></span> 고장나면 F12 콘솔에 에러 뜸(내가 잡아줌)
+          </div>
+          <div class="cards" id="places"></div>
         </div>
-      </div>
+      </section>
 
-      <!-- Right: monthly top10 -->
-      <div class="card">
+      <aside class="panel">
         <div class="hd">
-          <div>
-            <b>🏆 이달의 맛집 TOP 10</b>
-            <div class="small" id="topSubtitle"></div>
+          <div class="title">
+            <b>🏆 이달의 맛집 TOP10</b>
+            <span id="topSubtitle"></span>
           </div>
-          <button id="refreshTop" class="tight">새로고침</button>
+          <button id="refreshTop">새로고침</button>
         </div>
         <div class="bd">
-          <div id="topList"></div>
-          <div class="small" style="margin-top:10px;">
-            ✅ 좋아요는 <b>브라우저당 월 1회/가게</b> 정도만 막아둠(완전 방지는 로그인 필요).<br/>
-            ✅ ranking은 <b>구글시트에 쌓인 likes 합산</b>으로 계산.
+          <div id="topList" class="toplist"></div>
+          <div class="footnote">
+            TIP: 데모 넣고 ❤️ 누르면 순위가 바로 바뀌어야 정상이다잉.
           </div>
         </div>
-      </div>
+      </aside>
     </div>
   </div>
 
   <!-- Detail modal -->
-  <div class="backdrop" id="backdrop">
-    <div class="modal">
+  <div class="overlay" id="detailOverlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true">
       <div class="hd">
-        <div>
-          <div class="title" id="dName">-</div>
-          <div class="small" id="dSub">-</div>
+        <div class="left">
+          <div class="mname" id="dName">-</div>
+          <div class="msub" id="dSub">-</div>
         </div>
-        <button id="closeDetail" class="tight">닫기</button>
+        <button id="closeDetail">닫기</button>
       </div>
       <div class="bd">
-        <div class="kvs">
-          <div class="kvbox">
-            <div class="k">카테고리</div>
-            <div class="v" id="dCat">-</div>
-          </div>
-          <div class="kvbox">
-            <div class="k">평점</div>
-            <div class="v" id="dRate">-</div>
-          </div>
-          <div class="kvbox">
-            <div class="k">영업시간</div>
-            <div class="v" id="dHours">-</div>
-          </div>
-          <div class="kvbox">
-            <div class="k">브레이크타임</div>
-            <div class="v" id="dBreak">-</div>
-          </div>
-          <div class="kvbox">
-            <div class="k">주소/위치 메모</div>
-            <div class="v" id="dAddr">-</div>
-          </div>
-          <div class="kvbox">
-            <div class="k">태그</div>
-            <div class="v" id="dTags">-</div>
-          </div>
+        <div class="kvgrid">
+          <div class="kv"><div class="k">카테고리</div><div class="v" id="dCat">-</div></div>
+          <div class="kv"><div class="k">평점</div><div class="v" id="dRate">-</div></div>
+          <div class="kv"><div class="k">영업시간</div><div class="v" id="dHours">-</div></div>
+          <div class="kv"><div class="k">브레이크 타임</div><div class="v" id="dBreak">-</div></div>
+          <div class="kv"><div class="k">주소/위치 메모</div><div class="v" id="dAddr">-</div></div>
+          <div class="kv"><div class="k">태그</div><div class="v" id="dTags">-</div></div>
         </div>
-        <div class="kvbox" style="margin-top:10px">
+        <div class="review">
           <div class="k">한 줄 리뷰</div>
-          <div class="v" id="dNote" style="font-weight:600;line-height:1.5"></div>
+          <div class="v" id="dNote">-</div>
         </div>
       </div>
       <div class="ft">
-        <button id="toggleSave">⭐ 저장</button>
-        <button id="likeBtn" class="btn-primary">❤️ 좋아요</button>
+        <button id="toggleSave" class="btn-save">⭐ 저장</button>
+        <button id="likeBtn" class="btn-like">❤️ 좋아요</button>
       </div>
     </div>
   </div>
 
   <!-- Add modal -->
-  <div class="backdrop" id="addBackdrop">
-    <div class="modal">
+  <div class="overlay" id="addOverlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true">
       <div class="hd">
-        <div>
-          <div class="title">+ 맛집 추가</div>
-          <div class="small">브레이크타임도 입력 가능. (예: 15:00~17:00 / 없음)</div>
+        <div class="left">
+          <div class="mname">+ 맛집 추가</div>
+          <div class="msub">브레이크 타임도 입력해라잉 (예: 15:00~17:00 / 없음)</div>
         </div>
-        <button id="closeAdd" class="tight">닫기</button>
+        <button id="closeAdd">닫기</button>
       </div>
       <div class="bd">
-        <div class="row">
+        <div class="formgrid">
           <input id="aName" placeholder="상호명 (필수)" />
-          <select id="aCat" class="tight">
+          <select id="aCat">
             <option value="">카테고리(필수)</option>
             <option>한식</option><option>일식</option><option>중식</option><option>양식</option><option>분식</option>
             <option>카페</option><option>술집</option><option>디저트</option><option>기타</option>
           </select>
-          <input id="aRate" class="tight" placeholder="평점 (예: 4.6)" />
-        </div>
-        <div class="row" style="margin-top:10px">
-          <input id="aHours" placeholder="영업시간 (예: 11:00~21:00 / 매일 10~22)" />
-          <input id="aBreak" placeholder="브레이크타임 (예: 15:00~17:00 / 없음)" />
-        </div>
-        <div class="row" style="margin-top:10px">
-          <input id="aTags" placeholder="태그 (쉼표로 구분: 성수,혼밥,데이트)" />
+
+          <input id="aRate" placeholder="평점 (예: 4.6 / 비워도 됨)" />
           <input id="aAddr" placeholder="주소/위치 메모 (선택)" />
+
+          <input id="aHours" placeholder="영업시간 (예: 11:00~21:00)" />
+          <input id="aBreak" placeholder="브레이크 타임 (예: 15:00~17:00 / 없음)" />
+
+          <input id="aTags" class="full" placeholder="태그 (쉼표로 구분: 성수,혼밥,데이트)" />
+          <textarea id="aNote" class="full" placeholder="한 줄 리뷰(필수) 예: 국물 깔끔하고 회전 빠름."></textarea>
         </div>
-        <div style="margin-top:10px">
-          <textarea id="aNote" placeholder="한 줄 리뷰(필수) 예: 국물 깔끔, 회전 빠름."></textarea>
-        </div>
-        <div class="small muted" style="margin-top:8px">
-          * 현재는 맛집 등록/저장은 내 브라우저(localStorage).<br/>
-          * ❤️ 좋아요만 구글시트로 합산(다른 사람들과 공유되는 랭킹).
+
+        <div class="footnote">
+          * 맛집 등록/저장은 내 브라우저(localStorage).<br/>
+          * ❤️ 좋아요는 구글시트로 합산되어 TOP10에 반영됨.
         </div>
       </div>
       <div class="ft">
@@ -298,20 +464,22 @@
     </div>
   </div>
 
+  <div class="toast" id="toast">저장됨</div>
+
 <script>
 /* ============================
-   0) 너가 바꿀 건 이것 하나뿐
+   ✅ Apps Script Web App URL
    ============================ */
-const LIKE_API_URL = "https://script.google.com/macros/s/AKfycbzguY674lSLefGSKr0S0PkLyuQ9quEq1huyAWeVNAgBp5IuqMkfN9_KSnLD6q2DZXcH1w/exec";
+const LIKE_API_URL = "https://script.google.com/macros/s/AKfycbw8lCybnmrH3QSloTRpLeHRFno9kp3AlldKK9AvOlx8V1ECrq51CJZSyzVZBNLInb0SDA/exec";
 
 /* ============================
-   1) State / Storage
+   Storage / State
    ============================ */
-const LS_KEY = "matzip_picks_places_v1";
-const LS_SAVED = "matzip_picks_saved_v1";
+const LS_KEY   = "matzip_picks_places_v4";
+const LS_SAVED = "matzip_picks_saved_v4";
 
 let places = loadPlaces_();
-let savedMap = loadSaved_();     // {placeId:true}
+let savedMap = loadSaved_();
 let selectedId = null;
 
 const $ = (id)=>document.getElementById(id);
@@ -322,9 +490,21 @@ function ymNow(){
   const m = String(d.getMonth()+1).padStart(2,"0");
   return `${y}-${m}`;
 }
-
 function uid(){
   return "p_" + Math.random().toString(36).slice(2,9) + "_" + Date.now().toString(36);
+}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, m => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[m]));
+}
+
+function toast(msg){
+  const t = $("toast");
+  t.textContent = msg;
+  t.style.display = "block";
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(()=>{ t.style.display="none"; }, 1400);
 }
 
 function loadPlaces_(){
@@ -337,10 +517,7 @@ function loadPlaces_(){
   }catch(e){}
   return [];
 }
-
-function savePlaces_(){
-  localStorage.setItem(LS_KEY, JSON.stringify(places));
-}
+function savePlaces_(){ localStorage.setItem(LS_KEY, JSON.stringify(places)); }
 
 function loadSaved_(){
   try{
@@ -349,13 +526,10 @@ function loadSaved_(){
   }catch(e){}
   return {};
 }
-
-function saveSaved_(){
-  localStorage.setItem(LS_SAVED, JSON.stringify(savedMap));
-}
+function saveSaved_(){ localStorage.setItem(LS_SAVED, JSON.stringify(savedMap)); }
 
 /* ============================
-   2) Render
+   Render list
    ============================ */
 function renderList(){
   const q = ($("q").value || "").trim().toLowerCase();
@@ -364,9 +538,8 @@ function renderList(){
 
   let arr = [...places];
 
-  if(cat){
-    arr = arr.filter(p => (p.category || "") === cat);
-  }
+  if(cat) arr = arr.filter(p => (p.category || "") === cat);
+
   if(q){
     arr = arr.filter(p => {
       const hay = [
@@ -381,7 +554,6 @@ function renderList(){
   }else if(sort === "new"){
     arr.sort((a,b)=>(Number(b.createdAt||0)-Number(a.createdAt||0)));
   }else{
-    // 추천순: 저장된 것 우선 + 평점
     arr.sort((a,b)=>{
       const sa = savedMap[a.id] ? 1 : 0;
       const sb = savedMap[b.id] ? 1 : 0;
@@ -394,85 +566,91 @@ function renderList(){
 
   const el = $("places");
   if(!arr.length){
-    el.innerHTML = `<div class="muted">아직 등록된 맛집이 없다… + 맛집 추가나 데모 넣어보자잉 😎</div>`;
+    el.innerHTML = `<div class="muted">아직 등록된 맛집이 없다… + 데모 3개 넣고 스타트해보자잉 😎</div>`;
     return;
   }
 
-  el.innerHTML = arr.map(p => {
+  el.innerHTML = arr.map(p=>{
     const isSaved = !!savedMap[p.id];
-    const tags = (p.tags||"").split(",").map(s=>s.trim()).filter(Boolean).slice(0,3);
+    const tags = (p.tags||"").split(",").map(s=>s.trim()).filter(Boolean).slice(0,4);
+
+    const badgeSaved = isSaved ? `<span class="badge saved">⭐ 저장됨</span>` : "";
+    const ratingTxt = (p.rating ?? "-");
+    const hoursTxt  = p.hours ? `영업 <b>${escapeHtml(p.hours)}</b>` : `영업 <b>-</b>`;
+    const breakTxt  = p.breakTime ? `브레이크 타임 <b>${escapeHtml(p.breakTime)}</b>` : `브레이크 타임 <b>없음/미기입</b>`;
+
     return `
-      <div class="place">
-        <div class="meta">
+      <div class="card">
+        <div class="badges">
           <span class="badge">${escapeHtml(p.category||"기타")}</span>
-          ${isSaved ? `<span class="badge" style="border-color:rgba(167,243,208,.35);color:var(--accent2)">⭐ 저장됨</span>` : ``}
+          ${badgeSaved}
         </div>
-        <div class="title">${escapeHtml(p.name)}</div>
-        <div class="kv">
-          <span>평점: <b>${escapeHtml(String(p.rating ?? "-"))}</b></span>
-          ${p.hours ? `<span>· 영업: ${escapeHtml(p.hours)}</span>` : ``}
+
+        <div class="name">${escapeHtml(p.name)}</div>
+
+        <div class="meta">
+          <span>평점 <b>${escapeHtml(String(ratingTxt))}</b></span>
+          <span>· ${hoursTxt}</span>
         </div>
-        ${p.breakTime ? `<div class="kv">브레이크: ${escapeHtml(p.breakTime)}</div>` : ``}
-        <div class="kv">${tags.map(t=>`#${escapeHtml(t)}`).join(" ")}</div>
-        <div class="muted" style="font-size:13px;line-height:1.45">${escapeHtml(p.note||"")}</div>
-        <div class="actions">
+
+        <div class="meta">
+          <span>${breakTxt}</span>
+        </div>
+
+        <div class="tags">
+          ${(tags.length ? tags : ["태그없음"]).map(t=>`<span class="tag">#${escapeHtml(t)}</span>`).join("")}
+        </div>
+
+        <div class="desc">${escapeHtml(p.note||"")}</div>
+
+        <div class="btns">
           <button onclick="openDetail('${p.id}')">상세보기</button>
-          <button onclick="toggleSave('${p.id}')" class="${isSaved ? 'btn-primary':''}">${isSaved?'⭐ 저장됨':'⭐ 저장'}</button>
+          <button onclick="toggleSave('${p.id}')" class="${isSaved ? 'btn-primary':''}">
+            ${isSaved ? '⭐ 저장됨' : '⭐ 저장'}
+          </button>
         </div>
       </div>
     `;
   }).join("");
 }
 
-function escapeHtml(s){
-  return String(s).replace(/[&<>"']/g, m => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-  }[m]));
-}
-
 /* ============================
-   3) Detail modal
+   Detail modal
    ============================ */
 window.openDetail = function(id){
   selectedId = id;
   const p = places.find(x=>x.id===id);
   if(!p) return;
 
-  $("dName").textContent = p.name || "-";
-  $("dSub").textContent  = `${p.category || "기타"} · ${p.address ? p.address : "주소/위치: 미상"}`;
-  $("dCat").textContent  = p.category || "-";
-  $("dRate").textContent = (p.rating ?? "-");
-  $("dHours").textContent= p.hours || "미기입";
-  $("dBreak").textContent= p.breakTime || "없음/미기입";
-  $("dAddr").textContent = p.address || "미기입";
-  $("dTags").textContent = (p.tags || "없음").split(",").map(s=>s.trim()).filter(Boolean).map(t=>`#${t}`).join(" ") || "없음";
-  $("dNote").textContent = p.note || "-";
+  $("dName").textContent  = p.name || "-";
+  $("dSub").textContent   = `${p.category || "기타"} · ${p.address ? p.address : "주소/위치: 미상"}`;
+  $("dCat").textContent   = p.category || "-";
+  $("dRate").textContent  = (p.rating ?? "-");
+  $("dHours").textContent = p.hours || "미기입";
+  $("dBreak").textContent = p.breakTime || "없음/미기입";
+  $("dAddr").textContent  = p.address || "미기입";
+  $("dTags").textContent  = (p.tags || "없음").split(",").map(s=>s.trim()).filter(Boolean).map(t=>`#${t}`).join(" ") || "없음";
+  $("dNote").textContent  = p.note || "-";
 
-  const isSaved = !!savedMap[p.id];
-  $("toggleSave").textContent = isSaved ? "⭐ 저장됨" : "⭐ 저장";
-
-  $("backdrop").style.display = "flex";
+  $("toggleSave").textContent = savedMap[p.id] ? "⭐ 저장됨" : "⭐ 저장";
+  openOverlay_("detailOverlay");
 }
-
-function closeDetail(){
-  $("backdrop").style.display = "none";
-}
+function closeDetail(){ closeOverlay_("detailOverlay"); }
 
 /* ============================
-   4) Save toggle
+   Save toggle
    ============================ */
 window.toggleSave = function(id){
   savedMap[id] = !savedMap[id];
   if(!savedMap[id]) delete savedMap[id];
   saveSaved_();
   renderList();
-  if(selectedId === id){
-    $("toggleSave").textContent = savedMap[id] ? "⭐ 저장됨" : "⭐ 저장";
-  }
+  if(selectedId === id) $("toggleSave").textContent = savedMap[id] ? "⭐ 저장됨" : "⭐ 저장";
+  toast(savedMap[id] ? "⭐ 저장됨" : "저장 해제");
 }
 
 /* ============================
-   5) Likes (monthly, shared via Apps Script)
+   Likes (GET 방식)
    ============================ */
 async function likeMonthly(){
   if(!selectedId){
@@ -481,15 +659,13 @@ async function likeMonthly(){
   }
   const p = places.find(x=>x.id===selectedId);
   if(!p || !p.id){
-    alert("placeId를 못 찾았다… (데이터 id 확인 필요)");
-    return;
-  }
-  if(!LIKE_API_URL || LIKE_API_URL.includes("PASTE_YOUR")){
-    alert("LIKE_API_URL부터 넣어야 함! (Apps Script 웹앱 URL)");
+    alert("placeId를 못 찾았다…");
     return;
   }
 
   const month = ymNow();
+
+  // (선택) 같은 브라우저 월 1회 제한 (원하면 유지)
   const key = `liked_${month}_${p.id}`;
   if(localStorage.getItem(key)){
     alert("이번 달에 이 가게는 이미 좋아요 했다 아이가 😅");
@@ -500,37 +676,32 @@ async function likeMonthly(){
     $("likeBtn").disabled = true;
     $("likeBtn").textContent = "❤️ 반영중...";
 
-    // ✅ form-urlencoded로 보내서 CORS/프리플라이트 이슈 최소화
-    const res = await fetch(LIKE_API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
-      body: new URLSearchParams({ placeId: p.id, month })
-    });
-
+    const url = `${LIKE_API_URL}?action=like&month=${encodeURIComponent(month)}&placeId=${encodeURIComponent(p.id)}`;
+    const res = await fetch(url);
     const data = await res.json();
+
     if(!data.ok) throw new Error(data.error || "like failed");
 
     localStorage.setItem(key, "1");
-    alert(`좋아요 완료! 현재 ${data.likes}❤️ (이번 달)`);
-
+    toast(`❤️ +1 (이번달 ${data.likes})`);
     await refreshMonthlyRanking();
   }catch(e){
     console.warn(e);
-    alert("좋아요 실패… (배포/권한/URL/시트 탭) 다시 확인해보이소.");
+    alert("좋아요 실패… (배포/권한/URL 확인) F12 콘솔도 봐라잉.");
   }finally{
     $("likeBtn").disabled = false;
     $("likeBtn").textContent = "❤️ 좋아요";
   }
 }
 
+function nameById_(placeId){
+  const p = places.find(x=>x.id === placeId);
+  return p ? p.name : placeId;
+}
+
 async function refreshMonthlyRanking(){
   const month = ymNow();
   $("topSubtitle").textContent = `${month} 기준 · 모두의 좋아요 합산`;
-
-  if(!LIKE_API_URL){
-    $("topList").innerHTML = `<div class="muted">LIKE_API_URL이 비어있다…</div>`;
-    return;
-  }
 
   try{
     const url = `${LIKE_API_URL}?action=rank&month=${encodeURIComponent(month)}`;
@@ -540,38 +711,51 @@ async function refreshMonthlyRanking(){
 
     if(!ranking.length){
       $("topList").innerHTML = `
-        <div class="muted">아직 좋아요가 없다… 1등은 니가 만든다 😎</div>
-        <div class="small muted" style="margin-top:8px;">(좋아요 누르면 여기 순위로 뜸)</div>
+        <div class="topitem">
+          <div class="rankleft">
+            <div class="rankno">?</div>
+            <div class="rankname muted">아직 좋아요가 없다… 1등은 니가 만든다 😎</div>
+          </div>
+          <div class="ranklikes muted">0❤️</div>
+        </div>
       `;
       return;
     }
 
     $("topList").innerHTML = ranking.slice(0,10).map((r,i)=>{
-      const p = places.find(x=>x.id===r.placeId);
-      const name = p ? p.name : `(없는 맛집: ${r.placeId})`;
+      const name = nameById_(r.placeId);
       const likes = r.likes ?? 0;
+
       return `
-        <div class="top10line">
-          <div class="top10left"><b>${i+1}위</b> ${escapeHtml(name)}</div>
-          <div class="top10right"><b>${likes}</b>❤️</div>
+        <div class="topitem">
+          <div class="rankleft">
+            <div class="rankno">${i+1}</div>
+            <div class="rankname">${escapeHtml(name)}</div>
+          </div>
+          <div class="ranklikes">${likes}❤️</div>
         </div>
       `;
     }).join("");
   }catch(err){
     console.warn(err);
-    $("topList").innerHTML = `<div class="muted">랭킹 불러오기 실패… 콘솔(F12) 확인해보이소.</div>`;
+    $("topList").innerHTML = `
+      <div class="topitem">
+        <div class="rankleft">
+          <div class="rankno">!</div>
+          <div class="rankname muted">랭킹 불러오기 실패… (F12 콘솔 확인)</div>
+        </div>
+        <div class="ranklikes muted">-</div>
+      </div>
+    `;
   }
 }
 
 /* ============================
-   6) Add Place (with Break Time)
+   Add place
    ============================ */
-function openAdd(){
-  $("addBackdrop").style.display = "flex";
-}
-function closeAdd(){
-  $("addBackdrop").style.display = "none";
-}
+function openAdd(){ openOverlay_("addOverlay"); }
+function closeAdd(){ closeOverlay_("addOverlay"); }
+
 function addPlace(){
   const name = $("aName").value.trim();
   const category = $("aCat").value.trim();
@@ -587,6 +771,7 @@ function addPlace(){
   if(!note){ alert("한 줄 리뷰는 필수다 아이가."); return; }
 
   const rating = ratingRaw ? Number(ratingRaw) : null;
+
   const p = {
     id: uid(),
     name,
@@ -602,10 +787,11 @@ function addPlace(){
 
   places.unshift(p);
   savePlaces_();
-  closeAdd();
   clearAddForm_();
+  closeAdd();
   renderList();
-  refreshMonthlyRanking(); // 신규 placeId가 생겼으니, "없는 맛집" 방지용으로 갱신
+  refreshMonthlyRanking();
+  toast("✅ 맛집 추가됨");
 }
 
 function clearAddForm_(){
@@ -620,7 +806,7 @@ function clearAddForm_(){
 }
 
 /* ============================
-   7) Demo / Reset
+   Demo / Reset
    ============================ */
 function addDemo(){
   const now = Date.now();
@@ -633,7 +819,7 @@ function addDemo(){
       hours:"11:00~21:00",
       breakTime:"15:00~17:00",
       tags:"성수,혼밥,국밥",
-      address:"성수동(구글시트/메모)",
+      address:"성수동(메모)",
       note:"퇴근하고 한 그릇 때리기 딱 좋다 아이가(=좋음). 국물 깔끔, 회전 빠름.",
       createdAt: now-30000
     },
@@ -663,23 +849,24 @@ function addDemo(){
     }
   ];
 
-  // 기존 동일 id 있으면 업데이트, 없으면 추가
   for(const d of demo){
     const idx = places.findIndex(x=>x.id===d.id);
     if(idx>=0) places[idx] = {...places[idx], ...d};
     else places.push(d);
   }
+
   savePlaces_();
   renderList();
   refreshMonthlyRanking();
+  toast("데모 추가됨");
 }
 
 function resetAll(){
   if(!confirm("진짜 리셋할거가? (맛집/저장/좋아요 로컬 기록 다 날아감)")) return;
+
   localStorage.removeItem(LS_KEY);
   localStorage.removeItem(LS_SAVED);
 
-  // 좋아요 로컬키도 같이 지우기(이번달/가게별)
   const month = ymNow();
   Object.keys(localStorage).forEach(k=>{
     if(k.startsWith(`liked_${month}_`)) localStorage.removeItem(k);
@@ -688,13 +875,26 @@ function resetAll(){
   places = [];
   savedMap = {};
   selectedId = null;
+
   renderList();
   refreshMonthlyRanking();
+  toast("리셋 완료");
 }
 
 /* ============================
-   8) Wire up
+   Overlay helpers / Wiring
    ============================ */
+function openOverlay_(id){
+  const el = $(id);
+  el.style.display = "flex";
+  el.setAttribute("aria-hidden","false");
+}
+function closeOverlay_(id){
+  const el = $(id);
+  el.style.display = "none";
+  el.setAttribute("aria-hidden","true");
+}
+
 $("q").addEventListener("input", renderList);
 $("cat").addEventListener("change", renderList);
 $("sort").addEventListener("change", renderList);
@@ -706,15 +906,25 @@ $("addPlace").addEventListener("click", addPlace);
 $("addDemo").addEventListener("click", addDemo);
 $("reset").addEventListener("click", resetAll);
 
-$("closeDetail").addEventListener("click", closeDetail);
-$("backdrop").addEventListener("click", (e)=>{ if(e.target.id==="backdrop") closeDetail(); });
+$("refreshTop").addEventListener("click", refreshMonthlyRanking);
 
+$("closeDetail").addEventListener("click", closeDetail);
 $("toggleSave").addEventListener("click", ()=>toggleSave(selectedId));
 $("likeBtn").addEventListener("click", likeMonthly);
 
-$("refreshTop").addEventListener("click", refreshMonthlyRanking);
+// backdrop click close
+$("detailOverlay").addEventListener("click", (e)=>{ if(e.target.id==="detailOverlay") closeDetail(); });
+$("addOverlay").addEventListener("click", (e)=>{ if(e.target.id==="addOverlay") closeAdd(); });
 
-// 초기 렌더
+// esc close
+window.addEventListener("keydown", (e)=>{
+  if(e.key === "Escape"){
+    closeDetail();
+    closeAdd();
+  }
+});
+
+// initial
 renderList();
 refreshMonthlyRanking();
 </script>
