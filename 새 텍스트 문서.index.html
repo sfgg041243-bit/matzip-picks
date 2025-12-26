@@ -1,0 +1,962 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>맛집 추천 - Matzip Picks</title>
+  <style>
+    :root{
+      --bg:#0b0f19; --card:#121a2a; --muted:#94a3b8; --text:#e5e7eb;
+      --accent:#60a5fa; --accent2:#34d399; --warn:#fbbf24; --danger:#fb7185;
+      --line:#22314f; --chip:#0f172a;
+    }
+    *{box-sizing:border-box}
+    body{margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Noto Sans KR,sans-serif;
+      background:linear-gradient(180deg,#070a12, #0b0f19); color:var(--text);}
+    header{position:sticky; top:0; backdrop-filter: blur(10px);
+      background:rgba(11,15,25,.74); border-bottom:1px solid rgba(34,49,79,.6); z-index:10;}
+    .wrap{max-width:1120px; margin:0 auto; padding:18px 16px;}
+    .top{display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap;}
+    h1{font-size:20px; margin:0; letter-spacing:.2px}
+    .pill{font-size:12px; color:var(--muted); border:1px solid rgba(34,49,79,.9);
+      padding:6px 10px; border-radius:999px; background:rgba(15,23,42,.35)}
+    .controls{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px}
+    input, select, button, textarea{
+      background:rgba(18,26,42,.95); color:var(--text);
+      border:1px solid rgba(34,49,79,.9); border-radius:12px;
+      padding:10px 12px; font-size:14px; outline:none;
+    }
+    textarea{min-height:84px; resize:vertical}
+    input{min-width:260px}
+    button{cursor:pointer}
+    button.primary{border-color:rgba(96,165,250,.7)}
+    button.good{border-color:rgba(52,211,153,.7)}
+    button.warn{border-color:rgba(251,191,36,.7)}
+    button.danger{border-color:rgba(251,113,133,.7)}
+    button.ghost{background:transparent}
+    button:disabled{opacity:.55; cursor:not-allowed}
+    .tabs{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px}
+    .tab{padding:8px 10px; border-radius:999px; background:rgba(15,23,42,.25)}
+    .tab.on{border-color:rgba(96,165,250,.8); background:rgba(96,165,250,.12)}
+    main{padding:22px 0 60px}
+    .grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
+    @media (max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:560px){.grid{grid-template-columns:1fr} input{min-width:0; flex:1}}
+    .card{
+      background:rgba(18,26,42,.92);
+      border:1px solid rgba(34,49,79,.9);
+      border-radius:18px;
+      padding:14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      transition:transform .12s ease, border-color .12s ease;
+    }
+    .card:hover{transform:translateY(-2px); border-color:rgba(96,165,250,.65)}
+    .row{display:flex; align-items:center; justify-content:space-between; gap:10px}
+    .name{font-weight:800; font-size:16px; margin:2px 0 6px}
+    .meta{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+    .tag{font-size:12px; color:var(--muted); border:1px solid rgba(34,49,79,.9);
+      padding:4px 8px; border-radius:999px; background:rgba(15,23,42,.25)}
+    .tag.km{color:#c7d2fe}
+    .score{font-weight:800}
+    .score small{font-weight:600; color:var(--muted)}
+    .desc{color:var(--muted); font-size:13px; line-height:1.45; margin:10px 0 12px; min-height:38px}
+    .btns{display:flex; gap:8px; flex-wrap:wrap}
+    .fav{border-color:rgba(52,211,153,.7)}
+    .fav.on{background:rgba(52,211,153,.12)}
+    .empty{color:var(--muted); padding:20px 4px}
+    .hint{color:var(--muted); font-size:12px; margin-top:10px}
+    .rightTools{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end}
+
+    /* Modal */
+    .backdrop{position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; padding:16px}
+    .backdrop.show{display:flex}
+    .modal{
+      width:min(820px,100%); background:rgba(18,26,42,.98);
+      border:1px solid rgba(34,49,79,.9); border-radius:18px; padding:16px;
+      box-shadow: 0 18px 60px rgba(0,0,0,.45);
+    }
+    .modal h2{margin:0 0 8px; font-size:18px}
+    .modal .close{float:right}
+    .kvs{display:grid; grid-template-columns:140px 1fr; gap:10px; margin-top:12px}
+    .kvs div{padding:10px 12px; border:1px solid rgba(34,49,79,.9); border-radius:14px; color:var(--muted); background:rgba(15,23,42,.2)}
+    .kvs b{color:var(--text)}
+    .grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    @media (max-width:760px){.grid2{grid-template-columns:1fr}}
+    .formRow{display:flex; flex-direction:column; gap:6px}
+    .formRow label{font-size:12px; color:var(--muted)}
+    .split{display:flex; gap:10px; flex-wrap:wrap}
+    .split > *{flex:1}
+    .hr{height:1px; background:rgba(34,49,79,.75); margin:14px 0}
+    .small{font-size:12px; color:var(--muted)}
+    .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="wrap">
+    <div class="top">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <h1>🍜 Matzip Picks</h1>
+        <span class="pill">풀세트 MVP · no backend (서버 없이) · good vibes(감성)로 ㄱㄱ</span>
+      </div>
+      <div class="rightTools">
+        <span class="pill" id="countPill">0 places</span>
+        <span class="pill" id="locPill">📍 위치: 미사용</span>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab on" id="tabAll">전체</button>
+      <button class="tab" id="tabReco">추천</button>
+      <button class="tab" id="tabFav">즐겨찾기</button>
+      <button class="tab" id="tabRecent">최근 본</button>
+    </div>
+
+    <div class="controls">
+      <input id="q" placeholder="검색: 상호/태그/주소 (예: 성수, 파스타, 혼밥)"/>
+      <select id="cat">
+        <option value="all">카테고리: 전체</option>
+        <option value="한식">한식</option>
+        <option value="일식">일식</option>
+        <option value="중식">중식</option>
+        <option value="양식">양식</option>
+        <option value="카페">카페</option>
+        <option value="술집">술집</option>
+        <option value="기타">기타</option>
+      </select>
+      <select id="sort">
+        <option value="reco">정렬: 추천순</option>
+        <option value="score">정렬: 평점순</option>
+        <option value="near">정렬: 가까운순</option>
+        <option value="new">정렬: 최신추가</option>
+        <option value="name">정렬: 이름순</option>
+      </select>
+
+      <button class="good" id="useLoc">📍 내 위치 사용</button>
+      <button class="primary" id="addPlace">+ 맛집 추가</button>
+      <button class="ghost" id="addDemo">+ 데모 3개 추가</button>
+      <button class="ghost" id="reset">리셋</button>
+    </div>
+
+    <div class="controls" style="margin-top:10px">
+      <button class="ghost" id="exportBtn">데이터 내보내기(JSON)</button>
+      <button class="ghost" id="importBtn">데이터 가져오기(JSON)</button>
+      <input id="importFile" type="file" accept="application/json" style="display:none">
+      <span class="pill">팁: lat/lng 있으면 거리/가까운순 “진짜로” 됨</span>
+    </div>
+
+    <div class="hint">
+      ✅ 저장/추천/최근본은 브라우저에 저장됨(localStorage).  
+      ⚠️ 회사 PC에서 시크릿 모드면 저장이 날아갈 수 있다 아이가(=그럴 수 있음).
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" style="display:none;">검색 결과가 없데이(=없음). 키워드나 필터를 바꿔보이소.</div>
+</main>
+
+<!-- Detail Modal -->
+<div class="backdrop" id="detailBackdrop" role="dialog" aria-modal="true">
+  <div class="modal">
+    <button class="close ghost" id="closeDetail">닫기</button>
+    <h2 id="mTitle">-</h2>
+    <div class="meta" id="mMeta"></div>
+    <p class="desc" id="mDesc"></p>
+
+    <div class="kvs">
+      <div><b>주소</b><br><span id="mAddr">-</span></div>
+      <div><b>추천 메뉴</b><br><span id="mMenu">-</span></div>
+      <div><b>가격대</b><br><span id="mPrice">-</span></div>
+      <div><b>영업</b><br><span id="mHours">-</span></div>
+    </div>
+
+    <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap">
+      <button class="ghost" id="mapKakao">카카오 지도</button>
+      <button class="ghost" id="mapNaver">네이버 지도</button>
+      <button class="ghost" id="mapGoogle">구글 지도</button>
+      <button class="ghost" id="copy">정보 복사</button>
+      <button class="warn" id="edit">수정</button>
+      <button class="danger" id="del">삭제</button>
+    </div>
+
+    <div class="small" style="margin-top:10px">
+      최근 본 기록/추천 점수는 자동 반영됨. (요게 은근 “서비스 맛” 나게 함)
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="backdrop" id="formBackdrop" role="dialog" aria-modal="true">
+  <div class="modal">
+    <button class="close ghost" id="closeForm">닫기</button>
+    <h2 id="fTitle">맛집 추가</h2>
+    <div class="small">lat/lng(위도/경도)까지 넣으면 거리 정렬이 찐으로 됨. 없으면 지도 검색 링크로 커버 가능.</div>
+
+    <div class="hr"></div>
+
+    <div class="grid2">
+      <div class="formRow">
+        <label>가게명 *</label>
+        <input id="fName" placeholder="예: 연남 파스타 바" />
+      </div>
+      <div class="formRow">
+        <label>카테고리 *</label>
+        <select id="fCat">
+          <option value="한식">한식</option>
+          <option value="일식">일식</option>
+          <option value="중식">중식</option>
+          <option value="양식">양식</option>
+          <option value="카페">카페</option>
+          <option value="술집">술집</option>
+          <option value="기타">기타</option>
+        </select>
+      </div>
+
+      <div class="formRow">
+        <label>태그 (쉼표로 구분)</label>
+        <input id="fTags" placeholder="예: 성수, 혼밥, 국밥" />
+      </div>
+      <div class="formRow">
+        <label>평점 (0~5)</label>
+        <input id="fScore" type="number" min="0" max="5" step="0.1" placeholder="예: 4.7" />
+      </div>
+
+      <div class="formRow">
+        <label>주소</label>
+        <input id="fAddr" placeholder="예: 서울 성동구 ..." />
+      </div>
+      <div class="formRow">
+        <label>추천 메뉴</label>
+        <input id="fMenu" placeholder="예: 돈코츠 라멘, 차슈덮밥" />
+      </div>
+
+      <div class="formRow">
+        <label>가격대</label>
+        <input id="fPrice" placeholder="예: ₩₩ (1~2만원)" />
+      </div>
+      <div class="formRow">
+        <label>영업시간</label>
+        <input id="fHours" placeholder="예: 11:00-21:00" />
+      </div>
+
+      <div class="formRow">
+        <label>설명(한줄/메모)</label>
+        <textarea id="fDesc" placeholder="예: 분위기 good vibes(감성 좋음). 재방문 의사 100%"></textarea>
+      </div>
+      <div class="formRow">
+        <label>lat / lng (선택)</label>
+        <div class="split">
+          <input id="fLat" type="number" step="0.000001" placeholder="위도(lat) 예: 37.5665" />
+          <input id="fLng" type="number" step="0.000001" placeholder="경도(lng) 예: 126.9780" />
+        </div>
+        <div class="small">lat/lng는 구글 지도에서 위치 우클릭 → 좌표 복사하면 됨.</div>
+      </div>
+    </div>
+
+    <div class="hr"></div>
+
+    <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end">
+      <button class="ghost" id="fCancel">취소</button>
+      <button class="primary" id="fSave">저장</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================
+   Matzip Picks - Full MVP
+   ============================ */
+
+const LS_PLACES = "matzip_places_v2";
+const LS_FAVS   = "matzip_favs_v2";
+const LS_RECENT = "matzip_recent_v2";
+const LS_LOC    = "matzip_my_loc_v1";
+
+const seed = [
+  {
+    id:"s1",
+    name:"성수 국밥집",
+    cat:"한식",
+    tags:["성수","혼밥","국밥"],
+    score:4.6,
+    desc:"퇴근하고 한 그릇 때리기 딱 좋다 아이가(=좋음). 국물 깔끔, 회전 빠름.",
+    addr:"서울 성동구 어딘가 123",
+    menu:"돼지국밥, 수육",
+    price:"₩₩ (1~2만원)",
+    hours:"11:00-21:00",
+    lat:null, lng:null,
+    addedAt: Date.now()- 1000*60*60*24*7
+  },
+  {
+    id:"s2",
+    name:"연남 파스타 바",
+    cat:"양식",
+    tags:["연남","데이트","파스타"],
+    score:4.4,
+    desc:"분위기 good vibes(감성 좋음). 면 익힘 안정적, 와인도 있음.",
+    addr:"서울 마포구 어딘가 45",
+    menu:"크림파스타, 라구",
+    price:"₩₩₩ (2~3만원)",
+    hours:"12:00-22:00",
+    lat:null, lng:null,
+    addedAt: Date.now()- 1000*60*60*24*4
+  },
+  {
+    id:"s3",
+    name:"을지로 라멘",
+    cat:"일식",
+    tags:["을지로","라멘","웨이팅"],
+    score:4.7,
+    desc:"진한 돈코츠. 웨이팅 있을 수 있으니 타이밍 잘 봐라잉(=잘해).",
+    addr:"서울 중구 어딘가 9",
+    menu:"돈코츠 라멘, 차슈덮밥",
+    price:"₩₩ (1~2만원)",
+    hours:"11:30-20:30",
+    lat:null, lng:null,
+    addedAt: Date.now()- 1000*60*60*24*2
+  }
+];
+
+// --- State
+let places = loadPlaces();             // array
+let favs   = loadSet(LS_FAVS);         // Set
+let recent = loadArray(LS_RECENT);     // array of ids
+let myLoc  = loadJSON(LS_LOC, null);   // {lat,lng,ts} or null
+
+let activeTab = "all"; // all | reco | fav | recent
+let selectedId = null;
+let editingId  = null;
+
+// --- Elements
+const grid = document.getElementById("grid");
+const empty = document.getElementById("empty");
+const countPill = document.getElementById("countPill");
+const locPill = document.getElementById("locPill");
+
+const q = document.getElementById("q");
+const cat = document.getElementById("cat");
+const sort = document.getElementById("sort");
+
+const useLoc = document.getElementById("useLoc");
+const addPlace = document.getElementById("addPlace");
+const addDemo = document.getElementById("addDemo");
+const reset = document.getElementById("reset");
+
+const exportBtn = document.getElementById("exportBtn");
+const importBtn = document.getElementById("importBtn");
+const importFile = document.getElementById("importFile");
+
+// Tabs
+const tabAll = document.getElementById("tabAll");
+const tabReco = document.getElementById("tabReco");
+const tabFav = document.getElementById("tabFav");
+const tabRecent = document.getElementById("tabRecent");
+
+// Detail modal
+const detailBackdrop = document.getElementById("detailBackdrop");
+const closeDetail = document.getElementById("closeDetail");
+const mTitle = document.getElementById("mTitle");
+const mMeta  = document.getElementById("mMeta");
+const mDesc  = document.getElementById("mDesc");
+const mAddr  = document.getElementById("mAddr");
+const mMenu  = document.getElementById("mMenu");
+const mPrice = document.getElementById("mPrice");
+const mHours = document.getElementById("mHours");
+const mapKakao = document.getElementById("mapKakao");
+const mapNaver = document.getElementById("mapNaver");
+const mapGoogle = document.getElementById("mapGoogle");
+const copyBtn = document.getElementById("copy");
+const editBtn = document.getElementById("edit");
+const delBtn  = document.getElementById("del");
+
+// Form modal
+const formBackdrop = document.getElementById("formBackdrop");
+const closeForm = document.getElementById("closeForm");
+const fTitle = document.getElementById("fTitle");
+const fName  = document.getElementById("fName");
+const fCat   = document.getElementById("fCat");
+const fTags  = document.getElementById("fTags");
+const fScore = document.getElementById("fScore");
+const fAddr  = document.getElementById("fAddr");
+const fMenu  = document.getElementById("fMenu");
+const fPrice = document.getElementById("fPrice");
+const fHours = document.getElementById("fHours");
+const fDesc  = document.getElementById("fDesc");
+const fLat   = document.getElementById("fLat");
+const fLng   = document.getElementById("fLng");
+const fCancel= document.getElementById("fCancel");
+const fSave  = document.getElementById("fSave");
+
+// --- Events
+[q, cat, sort].forEach(el => el.addEventListener("input", render));
+
+tabAll.addEventListener("click", () => setTab("all"));
+tabReco.addEventListener("click", () => setTab("reco"));
+tabFav.addEventListener("click", () => setTab("fav"));
+tabRecent.addEventListener("click", () => setTab("recent"));
+
+useLoc.addEventListener("click", async () => {
+  if(!navigator.geolocation){
+    alert("이 브라우저는 위치 기능이 없데이(=없음).");
+    return;
+  }
+  useLoc.disabled = true;
+  useLoc.textContent = "📍 위치 가져오는 중...";
+  navigator.geolocation.getCurrentPosition(
+    (pos)=>{
+      myLoc = { lat: pos.coords.latitude, lng: pos.coords.longitude, ts: Date.now() };
+      saveJSON(LS_LOC, myLoc);
+      useLoc.disabled = false;
+      useLoc.textContent = "📍 내 위치 사용";
+      updateLocPill();
+      render();
+    },
+    (err)=>{
+      useLoc.disabled = false;
+      useLoc.textContent = "📍 내 위치 사용";
+      alert("위치 권한이 막혔거나 실패했데이. 브라우저 주소창 옆 🔒에서 권한 허용해보이소.");
+      console.warn(err);
+    },
+    { enableHighAccuracy:true, timeout: 8000 }
+  );
+});
+
+addDemo.addEventListener("click", () => {
+  const ids = new Set(places.map(p=>p.id));
+  let added = 0;
+  seed.forEach(p=>{
+    if(!ids.has(p.id)){
+      places.push(structPlace(p));
+      added++;
+    }
+  });
+  if(added){
+    savePlaces();
+    render();
+  }else{
+    alert("데모는 이미 들어가 있데이(=있음).");
+  }
+});
+
+addPlace.addEventListener("click", () => openForm(null));
+
+reset.addEventListener("click", () => {
+  q.value = "";
+  cat.value = "all";
+  sort.value = "reco";
+  setTab("all", true);
+  render();
+});
+
+exportBtn.addEventListener("click", () => {
+  const payload = {
+    version: 2,
+    exportedAt: new Date().toISOString(),
+    places,
+    favs: [...favs],
+    recent
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "matzip-picks-data.json";
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+importBtn.addEventListener("click", () => importFile.click());
+
+importFile.addEventListener("change", async () => {
+  const file = importFile.files?.[0];
+  if(!file) return;
+  try{
+    const text = await file.text();
+    const data = JSON.parse(text);
+
+    // Accept either full export or places array
+    if(Array.isArray(data)){
+      places = data.map(structPlace);
+    }else if(data && Array.isArray(data.places)){
+      places = data.places.map(structPlace);
+      if(Array.isArray(data.favs)) favs = new Set(data.favs);
+      if(Array.isArray(data.recent)) recent = data.recent;
+      saveSet(LS_FAVS, favs);
+      saveArray(LS_RECENT, recent);
+    }else{
+      throw new Error("형식이 다름");
+    }
+    savePlaces();
+    alert("가져오기 완료! 지렸다잉(=끝내줌).");
+    render();
+  }catch(e){
+    alert("JSON 읽기 실패… 파일 형식 확인해주이소.");
+    console.warn(e);
+  }finally{
+    importFile.value = "";
+  }
+});
+
+// Detail modal close
+closeDetail.addEventListener("click", closeDetailModal);
+detailBackdrop.addEventListener("click", (e)=>{ if(e.target===detailBackdrop) closeDetailModal(); });
+
+// Form modal close
+closeForm.addEventListener("click", closeFormModal);
+fCancel.addEventListener("click", closeFormModal);
+formBackdrop.addEventListener("click", (e)=>{ if(e.target===formBackdrop) closeFormModal(); });
+
+fSave.addEventListener("click", () => {
+  const data = readForm();
+  if(!data.name.trim()){
+    alert("가게명은 필수다 코노야로.");
+    return;
+  }
+  if(!data.cat){
+    alert("카테고리도 필수!");
+    return;
+  }
+
+  if(editingId){
+    const idx = places.findIndex(p=>p.id===editingId);
+    if(idx>=0){
+      places[idx] = { ...places[idx], ...data, updatedAt: Date.now() };
+      savePlaces();
+      closeFormModal();
+      render();
+      openDetail(editingId); // 바로 확인
+    }
+  }else{
+    const id = "p_" + Math.random().toString(36).slice(2,10);
+    places.push(structPlace({ id, ...data, addedAt: Date.now() }));
+    savePlaces();
+    closeFormModal();
+    render();
+  }
+});
+
+// Detail actions
+copyBtn.addEventListener("click", async () => {
+  const p = getById(selectedId);
+  if(!p) return;
+  const text =
+`[${p.name}]
+카테고리: ${p.cat}
+평점: ${fmtScore(p.score)}
+태그: ${(p.tags||[]).join(", ")}
+주소: ${p.addr||"-"}
+추천 메뉴: ${p.menu||"-"}
+가격대: ${p.price||"-"}
+영업: ${p.hours||"-"}
+좌표: ${p.lat ?? "-"}, ${p.lng ?? "-"}`;
+  try{
+    await navigator.clipboard.writeText(text);
+    copyBtn.textContent = "복사됨!";
+    setTimeout(()=>copyBtn.textContent="정보 복사", 900);
+  }catch{
+    alert("복사 실패… 브라우저 권한 확인해주이소.");
+  }
+});
+
+editBtn.addEventListener("click", () => {
+  const p = getById(selectedId);
+  if(!p) return;
+  closeDetailModal(false);
+  openForm(p);
+});
+
+delBtn.addEventListener("click", () => {
+  const p = getById(selectedId);
+  if(!p) return;
+  const ok = confirm(`"${p.name}" 진짜 삭제할끼? (복구 안 됨)`);
+  if(!ok) return;
+  places = places.filter(x=>x.id!==p.id);
+  favs.delete(p.id);
+  recent = recent.filter(id=>id!==p.id);
+  savePlaces(); saveSet(LS_FAVS, favs); saveArray(LS_RECENT, recent);
+  closeDetailModal();
+  render();
+});
+
+// Maps (no API; just search)
+mapKakao.addEventListener("click", ()=>openMap("kakao"));
+mapNaver.addEventListener("click", ()=>openMap("naver"));
+mapGoogle.addEventListener("click", ()=>openMap("google"));
+
+// --- Init
+updateLocPill();
+render();
+
+/* ============================
+   Helpers & Core Logic
+   ============================ */
+
+function setTab(tab, silent){
+  activeTab = tab;
+  tabAll.classList.toggle("on", tab==="all");
+  tabReco.classList.toggle("on", tab==="reco");
+  tabFav.classList.toggle("on", tab==="fav");
+  tabRecent.classList.toggle("on", tab==="recent");
+
+  // Tab default sort hint
+  if(!silent){
+    if(tab==="reco") sort.value = "reco";
+    if(tab==="fav") sort.value = "reco";
+    if(tab==="recent") sort.value = "new";
+  }
+  render();
+}
+
+function loadPlaces(){
+  const raw = loadJSON(LS_PLACES, null);
+  if(raw && Array.isArray(raw)) return raw.map(structPlace);
+  return [];
+}
+function savePlaces(){ saveJSON(LS_PLACES, places); }
+
+function loadJSON(key, fallback){
+  try{
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  }catch{ return fallback; }
+}
+function saveJSON(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
+
+function loadSet(key){
+  try{
+    const raw = localStorage.getItem(key);
+    return raw ? new Set(JSON.parse(raw)) : new Set();
+  }catch{ return new Set(); }
+}
+function saveSet(key, set){ localStorage.setItem(key, JSON.stringify([...set])); }
+
+function loadArray(key){
+  try{
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : [];
+  }catch{ return []; }
+}
+function saveArray(key, arr){ localStorage.setItem(key, JSON.stringify(arr)); }
+
+function structPlace(p){
+  // Normalize / ensure fields
+  const tags = Array.isArray(p.tags) ? p.tags : (typeof p.tags==="string" ? p.tags.split(",").map(s=>s.trim()).filter(Boolean) : []);
+  const score = numOrNull(p.score);
+  const lat = numOrNull(p.lat);
+  const lng = numOrNull(p.lng);
+  return {
+    id: p.id ?? ("p_" + Math.random().toString(36).slice(2,10)),
+    name: String(p.name ?? "").trim(),
+    cat: String(p.cat ?? "기타"),
+    tags,
+    score: (score==null ? 0 : clamp(score, 0, 5)),
+    desc: String(p.desc ?? ""),
+    addr: String(p.addr ?? ""),
+    menu: String(p.menu ?? ""),
+    price: String(p.price ?? ""),
+    hours: String(p.hours ?? ""),
+    lat, lng,
+    addedAt: p.addedAt ?? Date.now(),
+    updatedAt: p.updatedAt ?? null
+  };
+}
+
+function numOrNull(v){
+  if(v===null || v===undefined || v==="") return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+
+function fmtScore(s){
+  const n = Number(s);
+  if(!Number.isFinite(n)) return "-";
+  return n.toFixed(1).replace(/\.0$/, "");
+}
+
+function updateLocPill(){
+  if(myLoc && Number.isFinite(myLoc.lat) && Number.isFinite(myLoc.lng)){
+    locPill.textContent = `📍 위치: ON (${myLoc.lat.toFixed(3)}, ${myLoc.lng.toFixed(3)})`;
+  }else{
+    locPill.textContent = "📍 위치: 미사용";
+  }
+}
+
+function getById(id){ return places.find(p=>p.id===id); }
+
+function distanceKm(aLat, aLng, bLat, bLng){
+  // Haversine
+  const R = 6371;
+  const toRad = (d)=>d*Math.PI/180;
+  const dLat = toRad(bLat - aLat);
+  const dLng = toRad(bLng - aLng);
+  const sa = Math.sin(dLat/2)**2 +
+    Math.cos(toRad(aLat))*Math.cos(toRad(bLat))*Math.sin(dLng/2)**2;
+  const c = 2*Math.atan2(Math.sqrt(sa), Math.sqrt(1-sa));
+  return R*c;
+}
+
+function calcRecoScore(p){
+  // 추천 점수: 평점(0~5) * 20 + 즐겨찾기 + 최근본 + 거리(가까울수록 가점)
+  let score = (p.score ?? 0) * 20;
+
+  if(favs.has(p.id)) score += 18;            // fav boost
+  const idx = recent.indexOf(p.id);
+  if(idx >= 0) score += Math.max(0, 14 - idx*2); // 최근본 boost (앞에 있을수록 큼)
+
+  // 거리 가점: 0~5km = +15, 5~20km = +8, 20km~ = +0 (좌표 있을 때만)
+  if(myLoc && p.lat!=null && p.lng!=null){
+    const km = distanceKm(myLoc.lat, myLoc.lng, p.lat, p.lng);
+    if(km <= 5) score += 15;
+    else if(km <= 20) score += 8;
+  }
+
+  // 태그 다양성/충실도 살짝
+  if((p.tags||[]).length >= 3) score += 2;
+  return score;
+}
+
+function matchesFilters(p){
+  const keyword = q.value.trim().toLowerCase();
+  const inCat = (cat.value === "all") || (p.cat === cat.value);
+
+  const inQ = !keyword || (
+    (p.name||"").toLowerCase().includes(keyword) ||
+    (p.addr||"").toLowerCase().includes(keyword) ||
+    (p.tags||[]).some(t => (t||"").toLowerCase().includes(keyword))
+  );
+
+  // Tab filters
+  let inTab = true;
+  if(activeTab === "fav") inTab = favs.has(p.id);
+  if(activeTab === "recent") inTab = recent.includes(p.id);
+  // reco tab uses all but sorts by reco (still filter by query/cat)
+  return inCat && inQ && inTab;
+}
+
+function sortList(list){
+  const v = sort.value;
+
+  if(v === "name") return list.sort((a,b)=> (a.name||"").localeCompare(b.name||"", "ko"));
+  if(v === "new")  return list.sort((a,b)=> (b.addedAt||0) - (a.addedAt||0));
+  if(v === "score")return list.sort((a,b)=> (b.score||0) - (a.score||0));
+
+  if(v === "near"){
+    // If no location/coords, push to bottom
+    return list.sort((a,b)=>{
+      const ak = (myLoc && a.lat!=null && a.lng!=null) ? distanceKm(myLoc.lat, myLoc.lng, a.lat, a.lng) : Infinity;
+      const bk = (myLoc && b.lat!=null && b.lng!=null) ? distanceKm(myLoc.lat, myLoc.lng, b.lat, b.lng) : Infinity;
+      return ak - bk;
+    });
+  }
+
+  // default reco
+  return list.sort((a,b)=> calcRecoScore(b) - calcRecoScore(a));
+}
+
+function render(){
+  const filtered = places.filter(matchesFilters);
+  const list = sortList(filtered);
+
+  countPill.textContent = `${list.length} places`;
+  grid.innerHTML = "";
+  empty.style.display = list.length ? "none" : "block";
+
+  list.forEach(p=>{
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const top = document.createElement("div");
+    top.className = "row";
+
+    const left = document.createElement("div");
+    left.style.minWidth = "0";
+
+    const name = document.createElement("div");
+    name.className = "name";
+    name.textContent = p.name || "(이름 없음)";
+
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    meta.append(tag(p.cat || "기타"));
+
+    // tags preview
+    const tPreview = (p.tags||[]).slice(0,2).join(" · ");
+    if(tPreview) meta.append(tag(tPreview));
+
+    // distance preview if possible
+    if(myLoc && p.lat!=null && p.lng!=null){
+      const km = distanceKm(myLoc.lat, myLoc.lng, p.lat, p.lng);
+      const kmTag = tag(`${km.toFixed(1)}km`);
+      kmTag.classList.add("km");
+      meta.append(kmTag);
+    }
+
+    // reco preview on reco tab or reco sort
+    if(sort.value==="reco" || activeTab==="reco"){
+      const rs = calcRecoScore(p);
+      meta.append(tag(`추천 ${Math.round(rs)}`));
+    }
+
+    left.append(name, meta);
+
+    const right = document.createElement("div");
+    right.className = "score";
+    right.innerHTML = `${fmtScore(p.score)} <small>/5</small>`;
+
+    top.append(left, right);
+
+    const desc = document.createElement("div");
+    desc.className = "desc";
+    desc.textContent = p.desc || "메모 없음. (상세에서 수정 가능)";
+
+    const btns = document.createElement("div");
+    btns.className = "btns";
+
+    const detail = document.createElement("button");
+    detail.className = "primary";
+    detail.textContent = "상세보기";
+    detail.addEventListener("click", ()=>openDetail(p.id));
+
+    const fav = document.createElement("button");
+    fav.className = "fav";
+    if(favs.has(p.id)) fav.classList.add("on");
+    fav.textContent = favs.has(p.id) ? "★ 저장됨" : "☆ 저장";
+    fav.addEventListener("click", ()=>{
+      toggleFav(p.id);
+    });
+
+    btns.append(detail, fav);
+
+    card.append(top, desc, btns);
+    grid.appendChild(card);
+  });
+}
+
+function tag(text){
+  const span = document.createElement("span");
+  span.className = "tag";
+  span.textContent = text;
+  return span;
+}
+
+function toggleFav(id){
+  if(favs.has(id)) favs.delete(id);
+  else favs.add(id);
+  saveSet(LS_FAVS, favs);
+  render();
+}
+
+function openDetail(id){
+  const p = getById(id);
+  if(!p) return;
+  selectedId = id;
+
+  // push to recent
+  recent = recent.filter(x=>x!==id);
+  recent.unshift(id);
+  recent = recent.slice(0, 20);
+  saveArray(LS_RECENT, recent);
+
+  mTitle.textContent = p.name;
+  mDesc.textContent = p.desc || "";
+
+  mMeta.innerHTML = "";
+  const bits = [
+    `카테고리: ${p.cat}`,
+    `평점: ${fmtScore(p.score)}`,
+    `태그: ${(p.tags||[]).join(", ") || "-"}`
+  ];
+
+  if(myLoc && p.lat!=null && p.lng!=null){
+    const km = distanceKm(myLoc.lat, myLoc.lng, p.lat, p.lng);
+    bits.push(`거리: ${km.toFixed(2)} km`);
+  }else{
+    bits.push(`거리: (좌표/위치 필요)`);
+  }
+
+  bits.push(`추천 점수: ${Math.round(calcRecoScore(p))}`);
+
+  bits.forEach(b=>{
+    const span = document.createElement("span");
+    span.className = "tag";
+    span.textContent = b;
+    mMeta.appendChild(span);
+  });
+
+  mAddr.textContent = p.addr || "-";
+  mMenu.textContent = p.menu || "-";
+  mPrice.textContent = p.price || "-";
+  mHours.textContent = p.hours || "-";
+
+  detailBackdrop.classList.add("show");
+}
+
+function closeDetailModal(clearSel=true){
+  detailBackdrop.classList.remove("show");
+  if(clearSel) selectedId = null;
+}
+
+function openMap(provider){
+  const p = getById(selectedId);
+  if(!p) return;
+  const query = encodeURIComponent((p.name||"") + " " + (p.addr||""));
+
+  if(provider==="google"){
+    window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, "_blank");
+    return;
+  }
+  if(provider==="naver"){
+    window.open(`https://map.naver.com/v5/search/${query}`, "_blank");
+    return;
+  }
+  // kakao
+  window.open(`https://map.kakao.com/?q=${query}`, "_blank");
+}
+
+function openForm(placeOrNull){
+  editingId = placeOrNull?.id ?? null;
+  fTitle.textContent = editingId ? "맛집 수정" : "맛집 추가";
+
+  // fill
+  fName.value = placeOrNull?.name ?? "";
+  fCat.value  = placeOrNull?.cat ?? "기타";
+  fTags.value = (placeOrNull?.tags ?? []).join(", ");
+  fScore.value= placeOrNull?.score ?? "";
+  fAddr.value = placeOrNull?.addr ?? "";
+  fMenu.value = placeOrNull?.menu ?? "";
+  fPrice.value= placeOrNull?.price ?? "";
+  fHours.value= placeOrNull?.hours ?? "";
+  fDesc.value = placeOrNull?.desc ?? "";
+  fLat.value  = placeOrNull?.lat ?? "";
+  fLng.value  = placeOrNull?.lng ?? "";
+
+  formBackdrop.classList.add("show");
+}
+
+function closeFormModal(){
+  formBackdrop.classList.remove("show");
+  editingId = null;
+}
+
+function readForm(){
+  return {
+    name: (fName.value||"").trim(),
+    cat:  fCat.value,
+    tags: (fTags.value||"").split(",").map(s=>s.trim()).filter(Boolean),
+    score: clamp(Number(fScore.value||0), 0, 5),
+    addr: (fAddr.value||"").trim(),
+    menu: (fMenu.value||"").trim(),
+    price:(fPrice.value||"").trim(),
+    hours:(fHours.value||"").trim(),
+    desc: (fDesc.value||"").trim(),
+    lat:  (fLat.value===""? null : Number(fLat.value)),
+    lng:  (fLng.value===""? null : Number(fLng.value))
+  };
+}
+</script>
+</body>
+</html>
