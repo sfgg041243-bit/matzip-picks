@@ -470,7 +470,7 @@
 /* ============================
    ✅ Apps Script Web App URL
    ============================ */
-const LIKE_API_URL = "https://script.google.com/macros/s/AKfycbw8lCybnmrH3QSloTRpLeHRFno9kp3AlldKK9AvOlx8V1ECrq51CJZSyzVZBNLInb0SDA/exec";
+const LIKE_API_URL = "https://script.google.com/macros/s/AKfycbwaUYG79euufklGk9mAawb3rq1XL66FB7RCiVmB3zXT2XrkHyKrXMJut6kTfLNDKWtXbg/exec";
 
 /* ============================
    Storage / State
@@ -490,6 +490,14 @@ function ymNow(){
   const m = String(d.getMonth()+1).padStart(2,"0");
   return `${y}-${m}`;
 }
+
+function monthLabelKR(){
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = d.getMonth() + 1;
+  return `${y}년 ${m}월`;
+}
+
 function uid(){
   return "p_" + Math.random().toString(36).slice(2,9) + "_" + Date.now().toString(36);
 }
@@ -701,7 +709,7 @@ function nameById_(placeId){
 
 async function refreshMonthlyRanking(){
   const month = ymNow();
-  $("topSubtitle").textContent = `${month} 기준 · 모두의 좋아요 합산`;
+  $("topSubtitle").textContent = `${monthLabelKR()} 기준 · 모두의 좋아요 합산`;
 
   try{
     const url = `${LIKE_API_URL}?action=rank&month=${encodeURIComponent(month)}`;
